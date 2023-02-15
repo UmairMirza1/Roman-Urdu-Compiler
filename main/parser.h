@@ -1,7 +1,7 @@
 #ifndef _PARSER_H_
 #define _PARSER_H_
 #include "lexer.h"
-//for future assignments leave it as it is
+//for future additions
 class parser
 {
     lexer _lexer;
