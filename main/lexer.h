@@ -13,24 +13,38 @@ enum class TokenType
 	END_OF_FILE = 0,
 	ERROR,
 	markazi = 256,
-	kaam = 257,
-	karo = 258,
-	rakho = 259,
-	jab = 260,
-	tak = 261,
-	bas = 262,
-	agar = 263,
-	to = 264,
-	warna = 265,
-	phir = 266,
-	dekhao = 267,
-	lo = 268,
-	chalao = 269,
-	wapas = 270,
-	bhaijo = 271,
-	adad = 272,
-	khali = 273,
-	khatam = 274,
+	kaam,
+	karo,
+	rakho,
+	jab,
+	tak,
+	bas,
+	agar,
+	to,
+	warna,
+	phir,
+	dekhao,
+	lo,
+	chalao,
+	wapas,
+	bhaijo,
+	adad,
+	khali,
+	khatam,
+	ID,
+	RO,
+	LESS_THAN = 300,
+	GREATER_THAN,
+	EQUAL_TO,
+	NOT_EQUAL_TO,
+	LESS_THAN_OR_EQUAL_TO,
+	GREATER_THAN_OR_EQUAL_TO,
+
+	Output = 350,
+	Input = 351,
+	Null = 404
+
+	//
 
 };
 
@@ -45,11 +59,13 @@ struct token
 	token();
 	void Print();
 };
+
 class lexer
 {
 	vector<char> stream;  // used for storing file sample_code.ol content
 	vector<token> tokens; // vector to store all (tokens,lexeme) pairs
 	void Tokenize();	  // populates tokens vector
+
 	int index;
 
 public:
@@ -62,8 +78,5 @@ public:
 	void setCurrentPointer(int pos); // move current pointer to wherever
 	token peek(int);				 // peek the next token
 };
-
-int x = 10;
-int x = 10;
 
 #endif // !_LEXER_H
