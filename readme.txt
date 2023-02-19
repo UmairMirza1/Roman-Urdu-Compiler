@@ -13,7 +13,7 @@ specific case.
 --> Reset the DFA back to state 0 which would be our case 0
 --> Reset the lexeme
 --> Decrement the iterator in cases where there can be two different Tokens that can 
-occur without a spaces
+occur without a space
 
 
 
