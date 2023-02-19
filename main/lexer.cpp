@@ -1,9 +1,45 @@
 #include "lexer.h"
 using namespace std;
 
-// for printing tokens names, Same as the enum defined in lexer.h
+// for printing tokens names, Same as the enum defined in lexer.h // reserved
 string reserved[] = {
-    "END_OF_FILE"};
+    "END_OF_FILE",
+    "ERROR",
+    "markazi",
+    "kaam",
+    "karo",
+    "rakho",
+    "jab",
+    "tak",
+    "bas",
+    "agar",
+    "to",
+    "warna",
+    "phir",
+    "dekhao",
+    "lo",
+    "chalao",
+    "wapas",
+    "bhaijo",
+    "adad",
+    "khali",
+    "khatam",
+    "ID",
+    "RO",
+    "LESS_THAN",
+    "GREATER_THAN",
+    "EQUAL_TO",
+    "NOT_EQUAL_TO",
+    "LESS_THAN_OR_EQUAL_TO",
+    "GREATER_THAN_OR_EQUAL_TO",
+    "Output",
+    "Input",
+    "Null",
+    "Digit",
+    "string",
+    "koment"
+
+};
 token::token()
 {
     this->lexeme = "";
@@ -32,41 +68,68 @@ void lexer::setCurrentPointer(int pos)
         index = 0;
 }
 
-TokenType checkIfKeyword(string lex) {
+TokenType checkIfKeyword(string lex)
+{
 
-    // check if TokenType contains lex 
-    if (lex == "markazi") return TokenType::markazi;
-    if (lex == "kaam") return TokenType::kaam;
-    if (lex == "karo") return TokenType::karo;
-    if (lex == "rakho") return TokenType::rakho;
-    if (lex == "jab") return TokenType::jab;
-    if (lex == "tak") return TokenType::tak;
-    if (lex == "bas") return TokenType::bas;
-    if (lex == "agar") return TokenType::agar;
-    if (lex == "to") return TokenType::to;
-    if (lex == "warna") return TokenType::warna;
-    if (lex == "phir") return TokenType::phir;
-    if (lex == "dekhao") return TokenType::dekhao;
-    if (lex == "lo") return TokenType::lo;
-    if (lex == "chalao") return TokenType::chalao;
-    if (lex == "wapas") return TokenType::wapas;
-    if (lex == "bhaijo") return TokenType::bhaijo;
-    if (lex == "adad") return TokenType::adad;
-    if (lex == "khali") return TokenType::khali;
-    if (lex == "khatam") return TokenType::khatam;
+    // check if TokenType contains lex
+    if (lex == "markazi")
+        return TokenType::markazi;
+    if (lex == "kaam")
+        return TokenType::kaam;
+    if (lex == "karo")
+        return TokenType::karo;
+    if (lex == "rakho")
+        return TokenType::rakho;
+    if (lex == "jab")
+        return TokenType::jab;
+    if (lex == "tak")
+        return TokenType::tak;
+    if (lex == "bas")
+        return TokenType::bas;
+    if (lex == "agar")
+        return TokenType::agar;
+    if (lex == "to")
+        return TokenType::to;
+    if (lex == "warna")
+        return TokenType::warna;
+    if (lex == "phir")
+        return TokenType::phir;
+    if (lex == "dekhao")
+        return TokenType::dekhao;
+    if (lex == "lo")
+        return TokenType::lo;
+    if (lex == "chalao")
+        return TokenType::chalao;
+    if (lex == "wapas")
+        return TokenType::wapas;
+    if (lex == "bhaijo")
+        return TokenType::bhaijo;
+    if (lex == "adad")
+        return TokenType::adad;
+    if (lex == "khali")
+        return TokenType::khali;
+    if (lex == "khatam")
+        return TokenType::khatam;
 
     return TokenType::ID;
-    
-
-
 }
+
+void lexer::addToken(token t)
+{
+    tokens.push_back(t);
+}
+
+// void lexer::checkSpecial( char * it ){
+
+//    tokens.push_back(token( (*it), TokenType::Null));
+
+// }
 
 void lexer::Tokenize() // function that tokenizes your input stream
 {
     vector<char>::iterator it = stream.begin();
     // initial  *it
     int state = 0;
-    int finalState = 50;
 
     std::string currentLexeme = "";
     // Main loop for tokenization
@@ -76,17 +139,20 @@ void lexer::Tokenize() // function that tokenizes your input stream
         {
         // start state
         case 0:
+            //cout << "State 0" << endl;
             // transition to Identifier DFA
             if (isalpha(*it) || (*it) == '_')
             {
-                state = 1;
+
                 currentLexeme.push_back(*it);
+                state = 1;
             }
             // check for digit
             else if (isdigit(*it))
             {
-                state = 2;
+
                 currentLexeme.push_back(*it);
+                state = 2;
             }
             // Transition to string
             else if ((*it) == '`')
@@ -115,8 +181,9 @@ void lexer::Tokenize() // function that tokenizes your input stream
             // Transition to equal to operator DFA
             else if ((*it) == '=')
             {
-                state = 0;
+
                 tokens.push_back(token(currentLexeme, TokenType::EQUAL_TO));
+                state = 0;
             }
 
             else if ((*it) == ' ' || (*it) == '\t' || (*it) == '\n' || (*it) == '\r')
@@ -132,10 +199,10 @@ void lexer::Tokenize() // function that tokenizes your input stream
                 state = 0;
                 currentLexeme = "";
             }
-            
+
             // Excluding semi-colon and back tick as they have already been catered
             // for special characters
-            else if ((*it) == '(' || (*it) == ')' ||  (*it) == '|' || (*it) == '@' )
+            else if ((*it) == '(' || (*it) == ')' || (*it) == '|' || (*it) == '@')
             {
                 currentLexeme.push_back(*it);
                 tokens.push_back(token(currentLexeme, TokenType::Null));
@@ -143,37 +210,53 @@ void lexer::Tokenize() // function that tokenizes your input stream
                 currentLexeme = "";
             }
 
-            else if ( (*it) == ':'){
+            else if ((*it) == ':')
+            {
                 state = 7;
                 currentLexeme.push_back(*it);
             }
 
             break;
         case 1:
-            cout << "state 1";
+            //cout << "state 1";
             if (isalpha(*it) || (*it) == '_' || isdigit(*it))
             {
-                state = 1;
+
                 currentLexeme.push_back(*it);
+
+                state = 1;
             }
             else
             {
-              
-                // anything other than alphabet, digit or underscore
 
+                // anything other than alphabet, digit or underscore ( int , ^ )
                 // we have to check if its a reserved word
-                if ( checkIfKeyword(currentLexeme) != TokenType::ID)
-                    // add a safety check for null 
-                    tokens.push_back(token("", checkIfKeyword(currentLexeme)));
+                if (checkIfKeyword(currentLexeme) != TokenType::ID)
+        
+                {
+                    // std::cout << "\n"
+                    //           << "TokenAdded --keyword " + currentLexeme << "\n";
+
+                    tokens.push_back(token(string("^"), checkIfKeyword(currentLexeme)));
+
+                    it = --it;
+                }
                 else
-                    tokens.push_back(token(currentLexeme, TokenType::ID));
-                
+                {
+                    // std::cout << "\n"
+                    //           << "TokenAdded --ID " + currentLexeme << "\n";
+
+                    tokens.push_back(token(string(currentLexeme), TokenType::ID));
+
+                    it = --it;
+                }
+
                 state = 0;
                 currentLexeme = "";
             }
             break;
         case 2:
-            cout << "state 2";
+            //cout << "state 2";
 
             if (isdigit(*it))
             {
@@ -182,19 +265,24 @@ void lexer::Tokenize() // function that tokenizes your input stream
             }
             else
             {
-                tokens.push_back(token(currentLexeme, TokenType::adad));
+                // cout << "\n"
+                //      << "TokenAdded  " + currentLexeme << " \n";
+                tokens.push_back(token(string(currentLexeme), TokenType::Digit));
+                
                 state = 0;
                 currentLexeme = "";
+                --it;
             }
 
             break;
 
         case 3:
-            cout << "state 3";
+            //cout << "state 3";
 
             if ((*it) == '`')
             { //  TODO: check for double back tick
-                tokens.push_back(token(currentLexeme, TokenType::markazi));
+                currentLexeme.push_back(*it);
+                tokens.push_back(token(string(currentLexeme), TokenType::string));
                 state = 0;
                 currentLexeme = "";
             }
@@ -206,10 +294,19 @@ void lexer::Tokenize() // function that tokenizes your input stream
             break;
 
         case 4:
-            cout << "state 4";
+            //cout << "state 4";
 
             if ((*it) == '\n')
             {
+                if (currentLexeme.size() == 1)
+                {
+                    tokens.push_back(token(string(currentLexeme), TokenType::Null));
+                }
+
+                else
+                {
+                    tokens.push_back(token(string(currentLexeme), TokenType::koment));
+                }
                 state = 0;
                 currentLexeme = "";
             }
@@ -221,7 +318,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             break;
 
         case 5:
-            cout << "state 5 (RO, LE)";
+            //cout << "state 5 (RO, LE)";
 
             if ((*it) == '=')
             {
@@ -255,7 +352,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             break;
 
         case 6:
-            cout << "state 6 (RO, GE)";
+            //cout << "state 6 (RO, GE)";
 
             if ((*it) == '=')
             {
@@ -280,10 +377,11 @@ void lexer::Tokenize() // function that tokenizes your input stream
                 currentLexeme = "";
             }
             break;
-        
+
         case 7:
 
-            if ( (*it)=='=')
+            //cout << "state 7 assignment OP";
+            if ((*it) == '=')
             {
                 currentLexeme.push_back(*it);
                 tokens.push_back(token(currentLexeme, TokenType::Null));
@@ -296,15 +394,13 @@ void lexer::Tokenize() // function that tokenizes your input stream
                 state = 0;
                 currentLexeme = "";
             }
-
-    
-
         }
     }
 
     // push_back EOF token at end to identify End of File
     tokens.push_back(token(string(""), TokenType::END_OF_FILE));
 }
+
 lexer::lexer(const char filename[])
 {
     // constructors: takes file name as an argument and store all
@@ -358,7 +454,7 @@ token lexer::getNextToken()
         _token.tokenType = TokenType::END_OF_FILE;
     }
     else
-    {
+    { // cout << " trying to get " + this->index  << " index \n" ;
         _token = tokens[index];
         index = index + 1;
     }

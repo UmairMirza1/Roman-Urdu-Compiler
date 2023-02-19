@@ -1,5 +1,30 @@
 This will be our grammar file 
 Going to Leave it as it is for now
-GRAMMAR:
+GRAMMAR: 
 
-Regular Expressions used in GRAMMAR
+
+Regular Definition 
+
+Token → Identifier | Integer | String | Comment | RO | IO
+
+Identifier → (Und | Letter) AlphaNumeric* 
+
+Integer → Digit+
+
+String → Quotation (Character)* Quotation
+
+Comment → ; (Character)* 
+IO →  << | >>
+RO →  = | <> | < | <= | > | >=
+
+
+Digit  → 0 | 1 | … | 9
+Character → AlphaNumeric | IO | RO | SpecialChar | Quotation | ArithmeticOP 
+Quotation →` 
+AlphaNumeric → (Und |Letter | Integer)
+Letter → A|B|C|...|Z   |    a|b|c|...|z 
+ArithmeticOP → + | - | * | / | %
+SpecialChar → |  |  ;  | :  | `  |  (  |  ) | @ 
+Und → _ 
+
+

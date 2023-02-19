@@ -9,14 +9,17 @@ int main(int argc, char* argv[])
 	{
 		lexer _lexer(argv[1]);
 		//_lexer.printRaw();
+	
+		//_lexer.addToken(t);
 		token t;
 		t = _lexer.getNextToken();
-		// while (t.tokenType != TokenType::END_OF_FILE)
-		// {
-		// 	t.Print();
-		// 	t = _lexer.getNextToken();
-		// }
+		while (t.tokenType != TokenType::END_OF_FILE)
+		{
+			t.Print();
+			t = _lexer.getNextToken();
+		}
 		t.Print();
+
 
 	}
 	else if (argc > 2)
