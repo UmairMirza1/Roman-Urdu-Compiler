@@ -16,7 +16,9 @@ Integer → Digit+
 String → Quotation (Character)* Quotation
 
 Comment → ; (Character)* 
+
 IO →  << | >>
+
 RO →  = | <> | < | <= | > | >=
 
 
