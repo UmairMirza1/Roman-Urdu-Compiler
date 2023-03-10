@@ -31,23 +31,42 @@ void parser::resetPointer()
     _lexer.resetPointer();
 }
 //this function is for sample purposes only
-/*
-bool parser::statements()
-{
-    //statements-- > COLON LPAREN start RPAREN
-    if (_lexer.peek(1).tokenType == TokenType::COLON)
-    {
-        expect(TokenType::COLON);
-        if (_lexer.peek(1).tokenType == TokenType::LPAREN)
-        {
-            expect(TokenType::LPAREN);
-            start();
-            if (_lexer.peek(1).tokenType == TokenType::RPAREN)
-            {
-                expect(TokenType::RPAREN);
-                return true;
-            }
-        }
-    }
-    return false;
-}*/ 
+
+
+
+
+// bool parser::statements()
+// {
+//     //statements-- > COLON LPAREN start RPAREN
+//     if (_lexer.peek(1).tokenType == TokenType::COLON)
+//     {
+//         expect(TokenType::COLON);
+//         if (_lexer.peek(1).tokenType == TokenType::LPAREN)
+//         {
+//             expect(TokenType::LPAREN);
+//             start();
+//             if (_lexer.peek(1).tokenType == TokenType::RPAREN)
+//             {
+//                 expect(TokenType::RPAREN);
+//                 return true;
+//             }
+//         }
+//     }
+//     return false;
+// }
+
+
+
+
+//  P-> F | D 
+
+// D -> Type ID 
+
+// F -> Type ID LPAREN RPAREN
+// void D() {
+
+//     int Type();
+//     match(ID)
+//     match(SEMICOLON)
+
+// }

@@ -298,15 +298,15 @@ void lexer::Tokenize() // function that tokenizes your input stream
 
             if ((*it) == '\n')
             {
-                if (currentLexeme.size() == 1)
-                {
-                    tokens.push_back(token(string(currentLexeme), TokenType::Null));
-                }
+                // if (currentLexeme.size() == 1)
+                // {
+                //     tokens.push_back(token(string(currentLexeme), TokenType::Null));
+                // }
 
-                else
-                {
+                // else
+                // {
                     tokens.push_back(token(string(currentLexeme), TokenType::koment));
-                }
+                //}
                 state = 0;
                 currentLexeme = "";
             }

@@ -1,10 +1,10 @@
-kaam calculateFib@adad (n@adad | c@adad) karo
-    rakho z:=x+y;
+kaam calculateFib@adad (n@adad | c@adad) karo 
+    rakho z:=x+y; 
 	rakho x@adad:=0;
-	rakho y@adad := 0;
-	rakho z@adad;
+	rakho y@adad := 0; mariam
+	rakho z@adad ;
 	
-	agar (n < 0) to phir karo
+	agar (n < 0) to phir karo 
 		dekhao << `munfi number daal diya\n`;
 		wapas bhaijo 0; 
 	warna agar (n = 0) to phir
@@ -14,8 +14,7 @@ kaam calculateFib@adad (n@adad | c@adad) karo
 		dekhao << `\nfibonacci series: `;
 		rakho i@adad := 1;
 		jab tak (i-1 >= n) karo
-			dekhao << x << ` `;
-			
+			dekhao << x << ` `;			
 			rakho x := y;
 			rakho y := z;
 			rakho i := i + 1;
@@ -32,3 +31,5 @@ kaam markazi@khali () karo
 	rakho result@adad := chalao calculateFib(arg1 | arg2);
 	wapas bhaijo 0; halt
 kaam khatam
+
+

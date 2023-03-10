@@ -5,6 +5,8 @@
 class parser
 {
     lexer _lexer;
+    int address; 
+    
 public:
     void syntax_error();
     token expect(TokenType expected_type);
