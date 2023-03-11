@@ -11,7 +11,7 @@ kaam calculateFib@adad (n@adad | c@adad) karo
 		dekhao << `yar 0 hai!\n`;
 		wapas bhaijo 0;
 	warna phir
-		dekhao << `\nfibonacci series: `;
+		dekhao << `\nfibonacci series: `; 
 		rakho i@adad := 1;
 		jab tak (i-1 >= n) karo
 			dekhao << x << ` `;			

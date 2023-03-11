@@ -5,6 +5,7 @@ void parser::syntax_error()
     cout << "SYNTAX ERROR\n";
     exit(1);
 }
+// match function
 token parser::expect(TokenType expected_type)
 {
     token t = _lexer.getNextToken();
@@ -16,7 +17,7 @@ parser::parser(const char filename[])
 {
     _lexer = lexer(filename);
 }
-void parser::readAndPrintAllInput() //read and print allinputs (provided)
+void parser::readAndPrintAllInput() // read and print allinputs (provided)
 {
     token t;
     t = _lexer.getNextToken();
@@ -30,11 +31,64 @@ void parser::resetPointer()
 {
     _lexer.resetPointer();
 }
-//this function is for sample purposes only
+
+void parser::Program()
+{
+    
+    D(); Program();
+}
+
+void parser::D() {
+
+
+    if (_lexer.peek(1).tokenType == TokenType::kaam)
+    {
+        Function(); 
+    }
+    else {
+        Variable();
+    }
+
+}
+
+void parser::Variable() {
+    
+}
+// Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
+// FuncT -> khali | adad 
+// PL → ID @ adad MPL  | ^
+// MPL → | PL | ^
+
+void parser::Function() {
+
+    expect(TokenType::ID);
+    //match('a');
 
 
 
+}
 
+
+// void match(int tok) {
+// if (look == tok)
+// look = nextTok();
+// else{
+// parser::syntax_error();
+
+// }
+
+
+void parser::parse()
+{
+    token t;
+    t = _lexer.getNextToken();
+    while (t.tokenType != TokenType::END_OF_FILE)
+    {
+
+    }
+}
+
+// this function is for sample purposes only
 // bool parser::statements()
 // {
 //     //statements-- > COLON LPAREN start RPAREN
@@ -53,20 +107,4 @@ void parser::resetPointer()
 //         }
 //     }
 //     return false;
-// }
-
-
-
-
-//  P-> F | D 
-
-// D -> Type ID 
-
-// F -> Type ID LPAREN RPAREN
-// void D() {
-
-//     int Type();
-//     match(ID)
-//     match(SEMICOLON)
-
 // }
