@@ -5,6 +5,7 @@ void parser::syntax_error()
     cout << "SYNTAX ERROR\n";
     exit(1);
 }
+
 // match function
 token parser::expect(TokenType expected_type)
 {
@@ -34,40 +35,132 @@ void parser::resetPointer()
 
 void parser::Program()
 {
-    
-    D(); Program();
+
+    if (_lexer.peek(1).tokenType == TokenType::END_OF_FILE)
+    {
+        cout << "Program is correct\n";
+        return;
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::kaam || _lexer.peek(1).tokenType == TokenType::rakho || _lexer.peek(1).tokenType == TokenType::agar ||
+             _lexer.peek(1).tokenType == TokenType::jab || _lexer.peek(1).tokenType == TokenType::lo || _lexer.peek(1).tokenType == TokenType::dekhao)
+    {
+        D();
+        Program();
+    }
+    else
+    {
+        return;
+    }
 }
 
-void parser::D() {
-
+void parser::D()
+{
 
     if (_lexer.peek(1).tokenType == TokenType::kaam)
     {
-        Function(); 
+        Function();
     }
-    else {
-        Variable();
+    else if (_lexer.peek(1).tokenType == TokenType::rakho || _lexer.peek(1).tokenType == TokenType::agar ||
+             _lexer.peek(1).tokenType == TokenType::jab || _lexer.peek(1).tokenType == TokenType::lo || _lexer.peek(1).tokenType == TokenType::dekhao)
+    {
+        Code();
     }
-
+    else
+    {
+        parser::syntax_error();
+    }
 }
 
-void parser::Variable() {
-    
+void parser::Code()
+{
+    // ye hum kal likheng eg kyu k hauamar fimaghj nih chalhjrioewgiu9o;egqwio;ucfvgbedrwlo;.ugbher
+    return;
 }
-// Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
-// FuncT -> khali | adad 
-// PL → ID @ adad MPL  | ^
-// MPL → | PL | ^
 
-void parser::Function() {
+void parser::Function()
+{
 
+    expect(TokenType::kaam);
     expect(TokenType::ID);
-    //match('a');
-
-
-
+    matchAscii('@');
+    FuncT();
+    matchAscii('(');
+    ParameterList();
+    matchAscii(')');
+    expect(TokenType::karo);
+    Koment();
+    Code();
+    expect(TokenType::kaam);
+    expect(TokenType::khatam);
+    Koment();
 }
 
+void parser::Koment()
+{
+    if (_lexer.peek(1).tokenType == TokenType::koment)
+    {
+        expect(TokenType::koment);
+        return;
+    }
+    else
+    {
+        return;
+    }
+}
+
+void parser::ParameterList()
+{
+    if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
+
+        expect(TokenType::ID);
+        matchAscii('@');
+        expect(TokenType::adad);
+        MPL();
+    }
+    else if (int(_lexer.peek(2).lexeme[0]) == ')')
+    {
+        return;
+    }
+    else
+    {
+        parser::syntax_error();
+    }
+}
+// ( id@adad , )
+void parser::MPL()
+{
+
+    matchAscii('|');
+    ParameterList();
+}
+
+void parser::FuncT()
+{
+
+    if (_lexer.peek(1).tokenType == TokenType::khali || _lexer.peek(1).tokenType == TokenType::adad)
+    {
+        return;
+    }
+    else
+    {
+        parser::syntax_error();
+    }
+}
+
+void parser::matchAscii(int ascii)
+{
+
+    token t = _lexer.getNextToken();
+    if (int(t.lexeme[0]) == ascii)
+    {
+        return;
+    }
+    else
+    {
+        parser::syntax_error();
+    }
+}
 
 // void match(int tok) {
 // if (look == tok)
@@ -77,14 +170,12 @@ void parser::Function() {
 
 // }
 
-
 void parser::parse()
 {
     token t;
     t = _lexer.getNextToken();
     while (t.tokenType != TokenType::END_OF_FILE)
     {
-
     }
 }
 

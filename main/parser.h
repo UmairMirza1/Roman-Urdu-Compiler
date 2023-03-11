@@ -6,7 +6,7 @@ class parser
 {
     lexer _lexer;
     int address;
-    token look;
+    int look;
 
 public:
     void syntax_error();
@@ -25,5 +25,11 @@ public:
     void Variable();
     void Function();
     void parse();
+    void Code();
+    void matchAscii(int ascii);
+    void FuncT();
+    void ParameterList();
+    void MPL();
+    void Koment();
 };
 #endif

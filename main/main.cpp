@@ -1,5 +1,6 @@
 #include <iostream>
 #include "parser.h"
+#include <string>
 using namespace std;
 
 int main(int argc, char* argv[])
@@ -8,18 +9,21 @@ int main(int argc, char* argv[])
 	if (argc == 2)
 	{
 		lexer _lexer(argv[1]);
-		//_lexer.printRaw();
-	
-		//_lexer.addToken(t);
 		token t;
 		t = _lexer.getNextToken();
-		while (t.tokenType != TokenType::END_OF_FILE)
-		{
-			t.Print();
-			t = _lexer.getNextToken();
-		}
-		t.Print();
+		cout << int(t.lexeme[0]) << endl;
+		
+		// // while (t.tokenType != TokenType::END_OF_FILE)
+		// // {
+		// // 	t.Print();
+		// // 	t = _lexer.getNextToken();
+		// // }
+		// // t.Print();
 
+
+		// parser _parser(argv[1]);
+		// _parser.Program();
+		
 
 	}
 	else if (argc > 2)

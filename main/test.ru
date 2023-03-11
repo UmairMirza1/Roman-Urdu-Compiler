@@ -1,4 +1,4 @@
-kaam calculateFib@adad (n@adad | c@adad) karo 
+ ( kaam calculateFib@adad (n@adad | c@adad) karo 
     rakho z:=x+y; 
 	rakho x@adad:=0;
 	rakho y@adad := 0; mariam

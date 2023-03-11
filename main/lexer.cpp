@@ -119,12 +119,6 @@ void lexer::addToken(token t)
     tokens.push_back(t);
 }
 
-// void lexer::checkSpecial( char * it ){
-
-//    tokens.push_back(token( (*it), TokenType::Null));
-
-// }
-
 void lexer::Tokenize() // function that tokenizes your input stream
 {
     vector<char>::iterator it = stream.begin();
@@ -466,6 +460,7 @@ void lexer::resetPointer()
     index = 0;
 }
 
+// int look 
 token lexer::peek(int howFar)
 {
     if (howFar <= 0)
