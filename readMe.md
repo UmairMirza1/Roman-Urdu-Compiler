@@ -62,6 +62,71 @@ specific case.
 occur without a space
 
 
+### PHASE 2
+
+## Parser 
+
+CFG
+
+Program →  D Program | ^ 
+
+D → Var | Function 
+
+Var → Code 
+
+Code → Statement Code | If Code | While Code | ^
+
+
+
+Statement → Stmt Comment
+Stmt → Initialization | Declaration | Input | Output | Return
+
+Koment->Comment | ^
+
+
+Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
+FuncT -> khali | adad 
+PL → ID @ adad MPL  | ^
+MPL → | PL | ^
+
+
+Initialization →  Declaration := Val;
+Val → ID | Integer | Exp
+Declaration →  rakho ID @ adad ;
+
+
+Input → lo   InputMsg  >> ID   
+InputMsg → ^ | << String 
+
+Output →  dekhao <<  OutVal MoreOut 
+MoreOut → << OutVal MoreOut | ^
+OutVal → String | Val 
+
+
+Return-> wapis bhaijo Val
+
+
+
+----------------
+
+IF    →  agar Condition to phir karo Koment Code WG WP bas karo Koment
+WG  →  warna agar Koment Condition to phir Koment Code | ^
+WP  →  warna phir Koment  Code | ^
+
+Condition → Exp  RO  Exp  
+
+Exp -> T - Exp | T + Exp | T
+T-> L %  T | L /  T | L* T | L 
+L-> ID | Integer | ( Exp )
+
+While →  jab tak ( Condition ) karo Koment  Code bas karo Koment
+
+
+
+
+
+
+
 # Final product
 ![image](https://user-images.githubusercontent.com/44190606/219964236-8f14b88a-d262-4351-b72f-f5b1aea464b3.png)
 
