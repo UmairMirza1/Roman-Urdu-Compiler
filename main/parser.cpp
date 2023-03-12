@@ -73,13 +73,190 @@ void parser::D()
 
 void parser::Code()
 {
-    // ye hum kal likheng eg kyu k hauamar fimaghj nih chalhjrioewgiu9o;egqwio;ucfvgbedrwlo;.ugbher
-    return;
+    if (_lexer.peek(1).tokenType == TokenType::rakho ||
+        _lexer.peek(1).tokenType == TokenType::lo ||
+        _lexer.peek(1).tokenType == TokenType::dekhao)
+    {
+
+        Statement();
+        Code();
+    }
+    else if (
+        _lexer.peek(1).tokenType == TokenType::agar)
+
+    {
+        IF();
+        Code();
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::jab)
+    {
+        WHILE();
+        Code();
+    }
+    else
+    {
+        return;
+    }
+}
+
+void parser::Statement()
+{
+
+    Stmt();
+    expect(TokenType::koment);
+}
+
+void parser::Stmt()
+{
+    if (_lexer.peek(1).tokenType == TokenType::rakho)
+    {
+        Variable();
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::lo)
+    {
+        Input();
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::lo)
+    {
+        Output();
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::lo)
+    {
+        Return();
+    }
+    else
+    {
+        parser::syntax_error();
+    }
+}
+
+void parser::InputMsg()
+{
+
+    if (_lexer.peek(1).tokenType == TokenType::Input)
+    {
+        expect(TokenType::Output);
+        expect(TokenType::string);
+    }
+    else
+    {
+        return;
+    }
+}
+
+
+void parser::Val() {
+
+    
+}
+
+
+void parser::Outval()
+{
+    if (_lexer.peek(1).tokenType == TokenType::string)
+    {
+        expect(TokenType::string);
+        
+    }///----
+    // else if (_lexer.peek
+    // {
+    //     expect(TokenType::Output);
+    //     expect(TokenType::ID);
+    // }
+    else
+    {
+        syntax_error();
+    }
+}
+
+void parser::Input()
+{
+
+    expect(TokenType::lo);
+    InputMsg();
+    expect(TokenType::Input);
+    expect(TokenType::ID);
+}
+void parser::Output()
+{
+
+    expect(TokenType::dekhao);
+    expect(TokenType::Output);
+    Outval();
+}
+void parser::Return() {}
+
+void parser::IF()
+{
+    expect(TokenType::agar);
+    matchAscii('(');
+    Condition();
+    matchAscii(')');
+    expect(TokenType::to);
+    expect(TokenType::phir);
+    expect(TokenType::karo);
+    Koment();
+    Code();
+    WG();
+    WP();
+    expect(TokenType::bas);
+    expect(TokenType::karo);
+    Koment();
+}
+// Warna Agar --> else if
+void parser::WG()
+{
+    if (_lexer.peek(1).tokenType == TokenType::warna)
+    {
+        expect(TokenType::warna);
+        expect(TokenType::agar);
+        Koment();
+        Condition();
+        expect(TokenType::to);
+        expect(TokenType::phir);
+        expect(TokenType::karo);
+        Code();
+    }
+    else
+    {
+        return;
+    }
+}
+
+// Warna Phir --> else
+void parser::WP()
+{
+    if (_lexer.peek(1).tokenType == TokenType::warna)
+    {
+        expect(TokenType::warna);
+        expect(TokenType::karo);
+        Koment();
+        Code();
+    }
+    else
+    {
+        return;
+    }
+}
+
+void parser::WHILE()
+{
+
+    expect(TokenType::jab);
+    expect(TokenType::tak);
+    matchAscii('(');
+    Condition();
+    matchAscii(')');
+    expect(TokenType::karo);
+    Koment();
+    Code();
+    expect(TokenType::bas);
+    expect(TokenType::karo);
+    Koment();
 }
 
 void parser::Function()
 {
-
     expect(TokenType::kaam);
     expect(TokenType::ID);
     matchAscii('@');
@@ -110,6 +287,7 @@ void parser::Koment()
 
 void parser::ParameterList()
 {
+
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
 
@@ -118,16 +296,11 @@ void parser::ParameterList()
         expect(TokenType::adad);
         MPL();
     }
-    else if (int(_lexer.peek(2).lexeme[0]) == ')')
-    {
-        return;
-    }
     else
     {
-        parser::syntax_error();
     }
 }
-// ( id@adad , )
+
 void parser::MPL()
 {
 

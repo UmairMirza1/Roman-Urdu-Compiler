@@ -31,5 +31,20 @@ public:
     void ParameterList();
     void MPL();
     void Koment();
+    void Statement();
+    void IF();
+    void WHILE();
+    void Condition();
+    void Exp();
+    void WG();
+    void WP();
+    void Stmt();
+    void Input(); 
+    void Output();
+    void Return();
+    void InputMsg();
+    void Outval();
+    void Val();
+
 };
 #endif
