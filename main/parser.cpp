@@ -112,10 +112,6 @@ void parser::Statement()
     expect(TokenType::koment);
 }
 
-// Variable → rakho ID @ adad R
-// R → := Val | ^
-// Val → ID | Integer | Exp
-
 void parser::Variable()
 {
     expect(TokenType::rakho);
@@ -133,9 +129,15 @@ void parser::R()
         expect(TokenType::Assignment_OP);
         Val();
         // if we do not give this a token type
-        matchAscii(':');
-        matchAscii('=');
-        Val();
+        // matchAscii(':');
+        // matchAscii('=');
+        // Val();
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::chalao)
+    { // koi function chal raha hai agay
+        expect(TokenType::chalao);
+        expect(TokenType::ID);
+        matchAscii('(');
     }
     else
     {
@@ -152,7 +154,15 @@ void parser::Val()
     {
         expect(TokenType::Digit);
     }
-    else if (_lexer.peek(1).lexeme[0] == '-' || _lexer.peek(1).lexeme[0] == '+' || _lexer.peek(1).lexeme[0] == '*' || _lexer.peek(1).lexeme[0] == '/' || _lexer.peek(1).lexeme[0] == '%')
+    else if (_lexer.peek(1).tokenType == TokenType::chalao)
+    {
+        expect(TokenType::chalao);
+        expect(TokenType::ID);
+        matchAscii('(');
+        PLF();
+        matchAscii(')');
+    }
+    else if (_lexer.peek(2).lexeme[0] == '-' || _lexer.peek(2).lexeme[0] == '+' || _lexer.peek(2).lexeme[0] == '*' || _lexer.peek(2).lexeme[0] == '/' || _lexer.peek(2).lexeme[0] == '%')
     {
         Expression();
     }
@@ -212,6 +222,38 @@ void parser::Outval()
     }
 }
 
+void parser::Moreparams()
+{
+
+    if (_lexer.peek(1).lexeme[0] == '|')
+    {
+        matchAscii('|');
+        PLF();
+    }
+    else
+    {
+        return;
+    }
+}
+
+// Parameter list functions
+void parser::PLF()
+{
+    if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
+        expect(TokenType::ID);
+        Moreparams();
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::Digit)
+    {
+        expect(TokenType::Digit);
+        Moreparams();
+    }
+    else
+    {
+    }
+}
+
 void parser::Input()
 {
 
@@ -227,7 +269,13 @@ void parser::Output()
     expect(TokenType::Output);
     Outval();
 }
-void parser::Return() {}
+void parser::Return()
+{
+    expect(TokenType::wapas);
+    expect(TokenType::bhaijo);
+    expect(TokenType::Digit);
+    expect(TokenType::koment);
+}
 
 void parser::IF()
 {
