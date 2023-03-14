@@ -45,6 +45,13 @@ public:
     void InputMsg();
     void Outval();
     void Val();
+    void Expression();
+    void T();
+    void L();
+    void RO();
+    void R();
+
+
 
 };
 #endif

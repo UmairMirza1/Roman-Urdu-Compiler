@@ -1,20 +1,16 @@
-                                    CFG
+CFG
 
 
 Program →  D Program | ^ 
 
-D → Var | Function 
-
-Var → Code 
+D → Code | Function 
 
 Code → Statement Code | If Code | While Code | ^
 
-
-
 Statement → Stmt Comment
-Stmt → Initialization | Declaration | Input | Output | Return
+Stmt → Variable | Input | Output | Return
 
-Koment->Comment | ^
+Koment → Comment | ^
 
 
 Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
@@ -23,13 +19,13 @@ PL → ID @ adad MPL  | ^
 MPL → | PL | ^
 
 
-Initialization →  Declaration := Val;
+Variable → rakho ID @ adad R
+R → := Val | ^
 Val → ID | Integer | Exp
-Declaration →  rakho ID @ adad ;
 
 
 Input → lo   InputMsg  >> ID   
-InputMsg → ^ | << String 
+InputMsg → ^ | << String  
 
 Output →  dekhao <<  OutVal MoreOut 
 MoreOut → << OutVal MoreOut | ^
@@ -42,7 +38,7 @@ Return-> wapis bhaijo Val
 
 ----------------
 
-IF    →  agar Condition to phir karo Koment Code WG WP bas karo Koment
+IF    →  agar ( Condition ) to phir karo Koment Code WG WP bas karo Koment
 WG  →  warna agar Koment Condition to phir Koment Code | ^
 WP  →  warna phir Koment  Code | ^
 
@@ -53,3 +49,10 @@ T-> L %  T | L /  T | L* T | L
 L-> ID | Integer | ( Exp )
 
 While →  jab tak ( Condition ) karo Koment  Code bas karo Koment
+
+
+
+
+
+
+

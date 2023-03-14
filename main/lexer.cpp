@@ -37,7 +37,8 @@ string reserved[] = {
     "Null",
     "Digit",
     "string",
-    "koment"
+    "koment",
+    "Assignment_OP"
 
 };
 token::token()
@@ -378,7 +379,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             if ((*it) == '=')
             {
                 currentLexeme.push_back(*it);
-                tokens.push_back(token(currentLexeme, TokenType::Null));
+                tokens.push_back(token(currentLexeme, TokenType::Assignment_OP));
                 state = 0;
                 currentLexeme = "";
             }

@@ -1,10 +1,13 @@
- ( kaam calculateFib@adad (n@adad | c@adad) karo 
+ ; comment to ider b askta hai 
+
+ kaam calculateFib@adad (n@adad | c@adad) karo 
     rakho z:=x+y; 
 	rakho x@adad:=0;
 	rakho y@adad := 0; mariam
 	rakho z@adad ;
 	
-	agar (n < 0) to phir karo 
+	
+	agar (n < 0) to phir karo  
 		dekhao << `munfi number daal diya\n`;
 		wapas bhaijo 0; 
 	warna agar (n = 0) to phir

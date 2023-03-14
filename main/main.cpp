@@ -10,15 +10,15 @@ int main(int argc, char* argv[])
 	{
 		lexer _lexer(argv[1]);
 		token t;
-		t = _lexer.getNextToken();
-		cout << int(t.lexeme[0]) << endl;
+		// t = _lexer.getNextToken();
+		// cout << int(t.lexeme[0]) << endl;
 		
-		// // while (t.tokenType != TokenType::END_OF_FILE)
-		// // {
-		// // 	t.Print();
-		// // 	t = _lexer.getNextToken();
-		// // }
-		// // t.Print();
+		while (t.tokenType != TokenType::END_OF_FILE)
+		{
+			t.Print();
+			t = _lexer.getNextToken();
+		}
+		t.Print();
 
 
 		// parser _parser(argv[1]);

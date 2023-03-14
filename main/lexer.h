@@ -45,6 +45,7 @@ enum class TokenType
 	Digit,
 	string,
 	koment,
+	Assignment_OP
 	
 
 	//

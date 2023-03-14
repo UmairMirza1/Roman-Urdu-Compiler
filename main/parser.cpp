@@ -55,15 +55,20 @@ void parser::Program()
 
 void parser::D()
 {
+    // cout << "D()" ;
 
     if (_lexer.peek(1).tokenType == TokenType::kaam)
     {
         Function();
     }
     else if (_lexer.peek(1).tokenType == TokenType::rakho || _lexer.peek(1).tokenType == TokenType::agar ||
-             _lexer.peek(1).tokenType == TokenType::jab || _lexer.peek(1).tokenType == TokenType::lo || _lexer.peek(1).tokenType == TokenType::dekhao)
+             _lexer.peek(1).tokenType == TokenType::jab || _lexer.peek(1).tokenType == TokenType::lo || _lexer.peek(1).tokenType == TokenType::dekhao || _lexer.peek(1).tokenType == TokenType::wapas)
     {
         Code();
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::koment)
+    {
+        expect(TokenType::koment);
     }
     else
     {
@@ -75,7 +80,8 @@ void parser::Code()
 {
     if (_lexer.peek(1).tokenType == TokenType::rakho ||
         _lexer.peek(1).tokenType == TokenType::lo ||
-        _lexer.peek(1).tokenType == TokenType::dekhao)
+        _lexer.peek(1).tokenType == TokenType::dekhao ||
+        _lexer.peek(1).tokenType == TokenType::wapas)
     {
 
         Statement();
@@ -106,23 +112,68 @@ void parser::Statement()
     expect(TokenType::koment);
 }
 
+// Variable → rakho ID @ adad R
+// R → := Val | ^
+// Val → ID | Integer | Exp
+
+void parser::Variable()
+{
+    expect(TokenType::rakho);
+    expect(TokenType::ID);
+    matchAscii('@');
+    expect(TokenType::adad);
+    R();
+}
+
+void parser::R()
+{
+    if (_lexer.peek(1).tokenType == TokenType::Assignment_OP)
+    {
+        // if we give this a token type
+        expect(TokenType::Assignment_OP);
+        Val();
+        // if we do not give this a token type
+        matchAscii(':');
+        matchAscii('=');
+        Val();
+    }
+    else
+    {
+        return;
+    }
+}
+void parser::Val()
+{
+    if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
+        expect(TokenType::ID);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::Digit)
+    {
+        expect(TokenType::Digit);
+    }
+    else if (_lexer.peek(1).lexeme[0] == '-' || _lexer.peek(1).lexeme[0] == '+' || _lexer.peek(1).lexeme[0] == '*' || _lexer.peek(1).lexeme[0] == '/' || _lexer.peek(1).lexeme[0] == '%')
+    {
+        Expression();
+    }
+}
 void parser::Stmt()
 {
     if (_lexer.peek(1).tokenType == TokenType::rakho)
     {
-        Variable();
+        parser::Variable();
     }
     else if (_lexer.peek(1).tokenType == TokenType::lo)
     {
-        Input();
+        parser::Input();
     }
     else if (_lexer.peek(1).tokenType == TokenType::lo)
     {
-        Output();
+        parser::Output();
     }
     else if (_lexer.peek(1).tokenType == TokenType::lo)
     {
-        Return();
+        parser::Return();
     }
     else
     {
@@ -144,20 +195,12 @@ void parser::InputMsg()
     }
 }
 
-
-void parser::Val() {
-
-    
-}
-
-
 void parser::Outval()
 {
     if (_lexer.peek(1).tokenType == TokenType::string)
     {
         expect(TokenType::string);
-        
-    }///----
+    }
     // else if (_lexer.peek
     // {
     //     expect(TokenType::Output);
@@ -210,7 +253,6 @@ void parser::WG()
     {
         expect(TokenType::warna);
         expect(TokenType::agar);
-        Koment();
         Condition();
         expect(TokenType::to);
         expect(TokenType::phir);
@@ -287,10 +329,9 @@ void parser::Koment()
 
 void parser::ParameterList()
 {
-
+    // (  .   )
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
-
         expect(TokenType::ID);
         matchAscii('@');
         expect(TokenType::adad);
@@ -303,9 +344,15 @@ void parser::ParameterList()
 
 void parser::MPL()
 {
-
-    matchAscii('|');
-    ParameterList();
+    if (int(_lexer.peek(1).lexeme[0]) == '|')
+    {
+        matchAscii('|');
+        ParameterList();
+    }
+    else
+    {
+        return;
+    }
 }
 
 void parser::FuncT()
@@ -318,6 +365,114 @@ void parser::FuncT()
     else
     {
         parser::syntax_error();
+    }
+}
+
+void parser::Condition()
+{
+
+    Expression();
+    RO();
+    Expression();
+}
+
+void parser::RO()
+{
+    if (_lexer.peek(1).tokenType == TokenType::LESS_THAN_OR_EQUAL_TO)
+    {
+        expect(TokenType::LESS_THAN_OR_EQUAL_TO);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::LESS_THAN)
+    {
+        expect(TokenType::LESS_THAN);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::GREATER_THAN)
+    {
+        expect(TokenType::GREATER_THAN);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::GREATER_THAN_OR_EQUAL_TO)
+    {
+        expect(TokenType::GREATER_THAN_OR_EQUAL_TO);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::EQUAL_TO)
+    {
+        expect(TokenType::EQUAL_TO);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::NOT_EQUAL_TO)
+    {
+        expect(TokenType::NOT_EQUAL_TO);
+    }
+    else
+    {
+        parser::syntax_error();
+    }
+}
+
+// Exp -> T - Exp | T + Exp | T
+// T-> L %  T | L /  T | L* T | L
+// L-> ID | Integer | ( Exp )
+
+void parser::Expression()
+{
+    if (_lexer.peek(1).lexeme[0] == '-')
+    {
+        T();
+        matchAscii('-');
+        Expression();
+    }
+    else if (_lexer.peek(1).lexeme[0] == '+')
+    {
+        T();
+        matchAscii('+');
+        Expression();
+    }
+    else
+    {
+        T(); // check this
+    }
+}
+
+void parser::T()
+{
+    if (_lexer.peek(1).lexeme[0] == '%')
+    {
+        L();
+        matchAscii('%');
+        T();
+    }
+    else if (_lexer.peek(1).lexeme[0] == '/')
+    {
+        L();
+        matchAscii('/');
+        T();
+    }
+    else if (_lexer.peek(1).lexeme[0] == '*')
+    {
+        L();
+        matchAscii('*');
+        T();
+    }
+    else
+    {
+        L(); // check this
+    }
+}
+
+void parser::L()
+{
+    if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
+        expect(TokenType::ID);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::Digit)
+    {
+        expect(TokenType::Digit);
+    }
+    else if (_lexer.peek(1).lexeme[0] == '(')
+    {
+        matchAscii('(');
+        Expression();
+        matchAscii(')');
     }
 }
 
@@ -334,14 +489,6 @@ void parser::matchAscii(int ascii)
         parser::syntax_error();
     }
 }
-
-// void match(int tok) {
-// if (look == tok)
-// look = nextTok();
-// else{
-// parser::syntax_error();
-
-// }
 
 void parser::parse()
 {
