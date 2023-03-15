@@ -1,45 +1,4 @@
 #include "parser.h"
-#include "lexer.h"
-
-// string reserved2[] = {
-//     "END_OF_FILE",
-//     "ERROR",
-//     "markazi",
-//     "kaam",
-//     "karo",
-//     "rakho",
-//     "jab",
-//     "tak",
-//     "bas",
-//     "agar",
-//     "to",
-//     "warna",
-//     "phir",
-//     "dekhao",
-//     "lo",
-//     "chalao",
-//     "wapas",
-//     "bhaijo",
-//     "adad",
-//     "khali",
-//     "khatam",
-//     "ID",
-//     "RO",
-//     "LESS_THAN",
-//     "GREATER_THAN",
-//     "EQUAL_TO",
-//     "NOT_EQUAL_TO",
-//     "LESS_THAN_OR_EQUAL_TO",
-//     "GREATER_THAN_OR_EQUAL_TO",
-//     "Output",
-//     "Input",
-//     "Null",
-//     "Digit",
-//     "string",
-//     "koment",
-//     "Assignment_OP"
-
-// };
 
 void parser::syntax_error()
 {
@@ -81,7 +40,6 @@ void parser::DecreaseIndent()
     // program
     // -- D
     this->indent -= 2;
-    
 }
 
 void parser::PrintAndIncreaseIndent(string s)
@@ -100,7 +58,7 @@ void parser::Program()
     if (_lexer.peek(1).tokenType == TokenType::END_OF_FILE)
     {
         cout << "Program is correct\n";
-        cout << this->indent << endl;
+
         return;
     }
     else if (_lexer.peek(1).tokenType == TokenType::kaam || _lexer.peek(1).tokenType == TokenType::rakho || _lexer.peek(1).tokenType == TokenType::agar ||
@@ -303,11 +261,14 @@ void parser::Outval()
     {
         expect(TokenType::string);
     }
-    // else if (_lexer.peek
-    // {
-    //     expect(TokenType::Output);
-    //     expect(TokenType::ID);
-    // }
+    else if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
+        expect(TokenType::ID);
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::Digit)
+    {
+        expect(TokenType::Digit);
+    }
     else
     {
         syntax_error();
@@ -360,12 +321,26 @@ void parser::Input()
     expect(TokenType::Input);
     expect(TokenType::ID);
 }
+
+void parser::Cascading(){
+    PrintAndIncreaseIndent("Cascading()");
+    if(_lexer.peek(1).tokenType == TokenType::Output){
+        expect(TokenType::Output);
+        
+    }
+    else{
+        return;
+    }
+}
+
+
 void parser::Output()
 {
     PrintAndIncreaseIndent("Output()");
     expect(TokenType::dekhao);
     expect(TokenType::Output);
     Outval();
+    Cascading();
     DecreaseIndent();
 }
 void parser::Return()
@@ -410,11 +385,13 @@ void parser::WG()
     {
         expect(TokenType::warna);
         expect(TokenType::agar);
+        matchAscii('(');
         Condition();
         DecreaseIndent();
+        matchAscii(')');
         expect(TokenType::to);
         expect(TokenType::phir);
-        expect(TokenType::karo);
+        Koment();
         Code();
         DecreaseIndent();
     }
@@ -431,7 +408,7 @@ void parser::WP()
     if (_lexer.peek(1).tokenType == TokenType::warna)
     {
         expect(TokenType::warna);
-        expect(TokenType::karo);
+        expect(TokenType::phir);
         Koment();
         DecreaseIndent();
         Code();
@@ -445,7 +422,7 @@ void parser::WP()
 
 void parser::WHILE()
 {
-    cout << "WHILE()\n";
+    PrintAndIncreaseIndent("Jab Tak()");
     expect(TokenType::jab);
     expect(TokenType::tak);
     matchAscii('(');
@@ -476,11 +453,11 @@ void parser::Function()
     DecreaseIndent();
     matchAscii(')');
     expect(TokenType::karo);
+
     Koment();
     DecreaseIndent();
     Code();
     DecreaseIndent();
-
     expect(TokenType::kaam);
     expect(TokenType::khatam);
     Koment();
@@ -606,7 +583,7 @@ void parser::RO()
 void parser::Expression()
 {
     PrintAndIncreaseIndent("Expression()");
-    if (_lexer.peek(1).lexeme[0] == '-')
+    if (_lexer.peek(2).lexeme[0] == '-')
     {
         T();
         DecreaseIndent();
@@ -614,7 +591,7 @@ void parser::Expression()
         Expression();
         DecreaseIndent();
     }
-    else if (_lexer.peek(1).lexeme[0] == '+')
+    else if (_lexer.peek(2).lexeme[0] == '+')
     {
         T();
         DecreaseIndent();
@@ -699,11 +676,7 @@ void parser::matchAscii(int ascii)
 
 void parser::parse()
 {
-    token t;
-    t = _lexer.getNextToken();
-    while (t.tokenType != TokenType::END_OF_FILE)
-    {
-    }
+    parser::Program();
 }
 
 // this function is for sample purposes only

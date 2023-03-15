@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 		t.Print();
 
 		parser _parser(argv[1]);
-		_parser.Program();
+		_parser.parse();
 	}
 	else if (argc > 2)
 	{ // argument limit exceeds

@@ -9,18 +9,11 @@ class parser
     int look;
 
 public:
-    int indent= 0;
     void syntax_error();
     token expect(TokenType expected_type);
     parser(const char filename[]);
     void readAndPrintAllInput();
     void resetPointer();
-
-    /*Terminal functions goes here use peek and expect*/
-    /*use TokenType:: for token names for example
-        expect(TokenType::ASSIGN);   //example function call
-      */
-    // all your parser functions go here
     void Program();
     void D();
     void Variable();
@@ -52,13 +45,8 @@ public:
     void RO();
     void R();
     void PLF();
-    void Moreparams();
-    void PrintAndIncreaseIndent(string s);
-    void DecreaseIndent();
-
-    // Program 
-       
-
+    void FuncMain();
+    void Cascading();
 
 
 };
