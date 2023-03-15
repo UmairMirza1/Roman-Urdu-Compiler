@@ -9,6 +9,8 @@ class parser
     int look;
 
 public:
+
+    bool flag = false;
     int indent = 0;
     void syntax_error();
     token expect(TokenType expected_type);
@@ -51,5 +53,7 @@ public:
     void DecreaseIndent();
     void PrintAndIncreaseIndent(string s);
     void Moreparams();
+    void VarType();
+    void MarkaziOrNot();
 };
 #endif

@@ -1,9 +1,48 @@
 #include "myparser.h"
 
+string testreserved[] = {
+    "END_OF_FILE",
+    "ERROR",
+    "markazi",
+    "kaam",
+    "karo",
+    "rakho",
+    "jab",
+    "tak",
+    "bas",
+    "agar",
+    "to",
+    "warna",
+    "phir",
+    "dekhao",
+    "lo",
+    "chalao",
+    "wapas",
+    "bhaijo",
+    "adad",
+    "khali",
+    "khatam",
+    "ID",
+    "RO",
+    "LESS_THAN",
+    "GREATER_THAN",
+    "EQUAL_TO",
+    "NOT_EQUAL_TO",
+    "LESS_THAN_OR_EQUAL_TO",
+    "GREATER_THAN_OR_EQUAL_TO",
+    "Output",
+    "Input",
+    "Null",
+    "Digit",
+    "string",
+    "koment",
+    "Assignment_OP"
+
+};
 void parser::syntax_error()
 {
-    cout << "SYNTAX ERROR\n token found";
-    _lexer.peek(1).Print();
+    // cout << "SYNTAX ERROR\n token expected";
+    // _lexer.peek(1).Print();
     exit(1);
 }
 
@@ -12,8 +51,12 @@ token parser::expect(TokenType expected_type)
 {
     token t = _lexer.getNextToken();
     if (t.tokenType != expected_type)
-
+    {
+        cout << "Expected :" << testreserved[(int)expected_type] << "\n"
+             << "Got ";
+        t.Print();
         syntax_error();
+    }
     return t;
 }
 parser::parser(const char filename[])
@@ -53,13 +96,18 @@ void parser::PrintAndIncreaseIndent(string s)
 
 void parser::Program()
 {
+    if (flag)
+    {
+        return;
+    }
     PrintAndIncreaseIndent("Program");
 
     if (_lexer.peek(1).tokenType == TokenType::END_OF_FILE)
     {
         cout << "Program is correct\n";
+        flag = true;
 
-        return;
+        exit(0);
     }
     else if (_lexer.peek(1).tokenType == TokenType::kaam || _lexer.peek(1).tokenType == TokenType::rakho || _lexer.peek(1).tokenType == TokenType::agar ||
              _lexer.peek(1).tokenType == TokenType::jab || _lexer.peek(1).tokenType == TokenType::lo || _lexer.peek(1).tokenType == TokenType::dekhao)
@@ -78,6 +126,7 @@ void parser::Program()
     else
     {
         cout << "Program is correct---\n";
+        flag = true;
         return;
     }
 }
@@ -151,13 +200,30 @@ void parser::Statement()
     expect(TokenType::koment);
 }
 
+void parser::VarType()
+{
+    PrintAndIncreaseIndent("VarType");
+
+    if (_lexer.peek(1).lexeme[0] == '@')
+    {
+        matchAscii('@');
+        expect(TokenType::adad);
+    }
+    else
+    {
+        return;
+    }
+}
+
 void parser::Variable()
 {
     PrintAndIncreaseIndent("Variable");
     expect(TokenType::rakho);
     expect(TokenType::ID);
-    matchAscii('@');
-    expect(TokenType::adad);
+    // matchAscii('@');
+    // expect(TokenType::adad);
+    VarType();
+    DecreaseIndent();
     R();
     DecreaseIndent();
 }
@@ -186,9 +252,10 @@ void parser::R()
 void parser::Val()
 {
     PrintAndIncreaseIndent("Val");
-    if (_lexer.peek(1).tokenType == TokenType::ID)
+    if (_lexer.peek(2).lexeme[0] == '-' || _lexer.peek(2).lexeme[0] == '+' || _lexer.peek(2).lexeme[0] == '*' || _lexer.peek(2).lexeme[0] == '/' || _lexer.peek(2).lexeme[0] == '%')
     {
-        expect(TokenType::ID);
+        Expression();
+        DecreaseIndent();
     }
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
@@ -204,10 +271,10 @@ void parser::Val()
         matchAscii(')');
         // cout << "matched chalao ";
     }
-    else if (_lexer.peek(2).lexeme[0] == '-' || _lexer.peek(2).lexeme[0] == '+' || _lexer.peek(2).lexeme[0] == '*' || _lexer.peek(2).lexeme[0] == '/' || _lexer.peek(2).lexeme[0] == '%')
+    else if ((_lexer.peek(1).tokenType == TokenType::ID))
     {
-        Expression();
-        DecreaseIndent();
+
+        expect(TokenType::ID);
     }
 }
 void parser::Stmt()
@@ -322,26 +389,39 @@ void parser::Input()
     expect(TokenType::ID);
 }
 
-void parser::Cascading(){
+void parser::Cascading()
+{
     PrintAndIncreaseIndent("Cascading()");
-    if(_lexer.peek(1).tokenType == TokenType::Output){
+    if (_lexer.peek(1).tokenType == TokenType::Output)
+    {
         expect(TokenType::Output);
-        
+        Outval();
+        DecreaseIndent();
+        Cascading();
+        DecreaseIndent();
     }
-    else{
+    else
+    {
         return;
     }
 }
 
-
 void parser::Output()
 {
     PrintAndIncreaseIndent("Output()");
-    expect(TokenType::dekhao);
-    expect(TokenType::Output);
-    Outval();
-    Cascading();
-    DecreaseIndent();
+    //  dekhao << x << ` `;
+    if (_lexer.peek(1).tokenType == TokenType::dekhao)
+    {
+        expect(TokenType::dekhao);
+        expect(TokenType::Output);
+        Outval();
+        DecreaseIndent();
+        Cascading();
+        DecreaseIndent();
+    }
+    {
+        return;
+    }
 }
 void parser::Return()
 {
@@ -440,11 +520,23 @@ void parser::WHILE()
     DecreaseIndent();
 }
 
+void parser::MarkaziOrNot(){
+    if(_lexer.peek(1).tokenType == TokenType::ID){
+       expect(TokenType::ID);
+    }
+    else if(_lexer.peek(1).tokenType == TokenType::markazi){
+       expect(TokenType::markazi);
+    }
+    else{
+        syntax_error();
+    }
+}
+
 void parser::Function()
 {
     PrintAndIncreaseIndent("Function()");
     expect(TokenType::kaam);
-    expect(TokenType::ID);
+    MarkaziOrNot();
     matchAscii('@');
     FuncT();
     DecreaseIndent();

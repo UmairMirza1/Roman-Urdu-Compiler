@@ -1,6 +1,7 @@
  ; comment to ider b askta hai 
 
  kaam calculateFib@adad (n@adad | c@adad) karo  
+ 	rakho x := y+z;
  	rakho x@adad:=0;
 	rakho y@adad := 0; mariam
 	rakho z@adad ;
