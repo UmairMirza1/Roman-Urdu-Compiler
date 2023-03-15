@@ -1,6 +1,6 @@
 EXEC = a.out
 CC = g++
-OBJ = lexer.o main.o parser.o
+OBJ = lexer.o main.o myparser.o
 
 $(EXEC) : $(OBJ)
 	$(CC) $(OBJ) -o $(EXEC) -lm
@@ -11,8 +11,8 @@ lexer.o : lexer.cpp lexer.h
 main.o : main.cpp lexer.h
 	$(CC) -c main.cpp
 
-parser.o:parser.cpp parser.h
-	$(CC) -c parser.cpp
+parser.o:myparser.cpp myparser.h
+	$(CC) -c myparser.cpp
 
 clean:
-	rm -f $(EXEC) lexer.o main.o parser.o
+	rm -f $(EXEC) lexer.o main.o myparser.o
