@@ -9,6 +9,7 @@ class parser
     int look;
 
 public:
+    int indent= 0;
     void syntax_error();
     token expect(TokenType expected_type);
     parser(const char filename[]);
@@ -52,6 +53,11 @@ public:
     void R();
     void PLF();
     void Moreparams();
+    void PrintAndIncreaseIndent(string s);
+    void DecreaseIndent();
+
+    // Program 
+       
 
 
 
