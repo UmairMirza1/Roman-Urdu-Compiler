@@ -1,15 +1,15 @@
 #ifndef _PARSER_H_
 #define _PARSER_H_
 #include "lexer.h"
+#include <unordered_map>
 // for future additions
 class parser
 {
     lexer _lexer;
-    int address;
-    int look;
 
 public:
-
+    // id, type
+    std::unordered_map<std::string, std::string> symbolTable;
     bool flag = false;
     int indent = 0;
     void syntax_error();
@@ -55,5 +55,6 @@ public:
     void Moreparams();
     void VarType();
     void MarkaziOrNot();
+    void ShowSymbolTable();
 };
 #endif

@@ -57,6 +57,9 @@ token parser::expect(TokenType expected_type)
         t.Print();
         syntax_error();
     }
+    PrintAndIncreaseIndent(testreserved[(int)expected_type]);
+    DecreaseIndent();
+  
     return t;
 }
 parser::parser(const char filename[])
@@ -82,6 +85,8 @@ void parser::DecreaseIndent()
 {
     // program
     // -- D
+    if (indent == 0)
+        return;
     this->indent -= 2;
 }
 
@@ -96,24 +101,28 @@ void parser::PrintAndIncreaseIndent(string s)
 
 void parser::Program()
 {
-    if (flag)
-    {
-        return;
-    }
+
     PrintAndIncreaseIndent("Program");
 
     if (_lexer.peek(1).tokenType == TokenType::END_OF_FILE)
     {
-        cout << "Program is correct\n";
-        flag = true;
-
-        exit(0);
+        // expect(TokenType::END_OF_FILE);
+        cout << "Program is correct now\n";
+        parser::resetPointer();
+        return;
     }
     else if (_lexer.peek(1).tokenType == TokenType::kaam || _lexer.peek(1).tokenType == TokenType::rakho || _lexer.peek(1).tokenType == TokenType::agar ||
              _lexer.peek(1).tokenType == TokenType::jab || _lexer.peek(1).tokenType == TokenType::lo || _lexer.peek(1).tokenType == TokenType::dekhao)
     {
         D();
         DecreaseIndent();
+        if (_lexer.peek(1).tokenType == TokenType::END_OF_FILE)
+        {
+            // expect(TokenType::END_OF_FILE);
+            cout << "Program is correct now2\n";
+            parser::resetPointer();
+            return;
+        }
         Program();
         DecreaseIndent();
     }
@@ -125,8 +134,7 @@ void parser::Program()
     }
     else
     {
-        cout << "Program is correct---\n";
-        flag = true;
+        cout << "here";
         return;
     }
 }
@@ -206,6 +214,7 @@ void parser::VarType()
 
     if (_lexer.peek(1).lexeme[0] == '@')
     {
+
         matchAscii('@');
         expect(TokenType::adad);
     }
@@ -219,6 +228,10 @@ void parser::Variable()
 {
     PrintAndIncreaseIndent("Variable");
     expect(TokenType::rakho);
+    if (_lexer.peek(1).tokenType == TokenType::ID ){
+        std::string varName = _lexer.peek(1).lexeme;
+        this->symbolTable[varName] ="ADAD";
+    }
     expect(TokenType::ID);
     // matchAscii('@');
     // expect(TokenType::adad);
@@ -357,6 +370,16 @@ void parser::Moreparams()
         return;
     }
 }
+
+void parser::ShowSymbolTable(){
+
+    cout<< "-----Symbol table ----- \n";
+    for (auto x : this->symbolTable)
+    cout << x.first << " " << 
+            x.second << endl;   
+
+}
+
 
 // Parameter list functions
 void parser::PLF()
@@ -520,14 +543,23 @@ void parser::WHILE()
     DecreaseIndent();
 }
 
-void parser::MarkaziOrNot(){
-    if(_lexer.peek(1).tokenType == TokenType::ID){
-       expect(TokenType::ID);
+void parser::MarkaziOrNot()
+{
+    if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
+        std::string FuncName = _lexer.peek(1).lexeme;
+        this->symbolTable[FuncName] ="FUNC";
+        expect(TokenType::ID);
+
+        
     }
-    else if(_lexer.peek(1).tokenType == TokenType::markazi){
-       expect(TokenType::markazi);
+    else if (_lexer.peek(1).tokenType == TokenType::markazi)
+    {
+        expect(TokenType::markazi);
+        this->symbolTable["MARKAZI"] ="FUNC";
     }
-    else{
+    else
+    {
         syntax_error();
     }
 }
@@ -758,6 +790,8 @@ void parser::matchAscii(int ascii)
     token t = _lexer.getNextToken();
     if (int(t.lexeme[0]) == ascii)
     {
+        PrintAndIncreaseIndent(t.lexeme);
+        DecreaseIndent();
         return;
     }
     else

@@ -1,7 +1,7 @@
 EXEC = a.out
 CC = g++
 OBJ = lexer.o main.o myparser.o
-
+CFLAGS= -g -Wall -Wextra
 $(EXEC) : $(OBJ)
 	$(CC) $(OBJ) -o $(EXEC) -lm
 
