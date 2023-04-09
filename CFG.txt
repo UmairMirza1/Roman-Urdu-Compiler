@@ -3,14 +3,14 @@ CFG
 
 Program →  D Program | ^ 
 
-D → Code | Function 
+D → Code | Function | Koment 
 
 Code → Statement Code | If Code | While Code | ^
 
 Statement → Stmt Comment
 Stmt → Variable | Input | Output | Return
 
-Koment → Comment | ^
+Koment → Comment  | ^
 
 
 Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
@@ -19,9 +19,13 @@ PL → ID @ adad MPL  | ^
 MPL → | PL | ^
 
 
-Variable → rakho ID @ adad R
+Variable → rakho ID  Type  R
+Type → @ adad | ^
 R → := Val | ^
-Val → ID | Integer | Exp
+Val → ID | Integer | Exp | chalao ID (PLF) 
+PLF → ID MPLF | Integer MPLF | ^ 
+MPLF → |  PLF |^
+ 
 
 
 Input → lo   InputMsg  >> ID   
@@ -39,7 +43,7 @@ Return-> wapis bhaijo Val
 ----------------
 
 IF    →  agar ( Condition ) to phir karo Koment Code WG WP bas karo Koment
-WG  →  warna agar Koment Condition to phir Koment Code | ^
+WG  →  warna agar Condition to phir Koment Code | ^
 WP  →  warna phir Koment  Code | ^
 
 Condition → Exp  RO  Exp  
@@ -49,10 +53,3 @@ T-> L %  T | L /  T | L* T | L
 L-> ID | Integer | ( Exp )
 
 While →  jab tak ( Condition ) karo Koment  Code bas karo Koment
-
-
-
-
-
-
-
