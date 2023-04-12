@@ -12,6 +12,7 @@ public:
     std::unordered_map<std::string, std::string> symbolTable;
     bool flag = false;
     int indent = 0;
+    int ln = 0;
     void syntax_error();
     token expect(TokenType expected_type);
     parser(const char filename[]);
@@ -33,7 +34,7 @@ public:
     void WHILE();
     void Condition();
     void Exp();
-    void WG();
+    int WG();
     void WP();
     void Stmt();
     void Input();

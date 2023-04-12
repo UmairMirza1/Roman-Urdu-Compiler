@@ -1,49 +1,20 @@
 ## ROMAN URDU COMPILER
 
-ru is our file extension abbreviation of "Roman Urdu". The compiler that we are going to make.
-This readme file will contain the details, the pros and cons. Special cases. etc etc.
-
-## Grammar 
-Regular Definition 
-
-
-Token → Identifier | Integer | String | Comment | RO | IO
-
-Identifier → (Und | Letter) AlphaNumeric* 
-
-Integer → Digit+
-
-String → Quotation (Character)* Quotation
-
-Comment → ; (Character)* 
-
-IO →  << | >>
-
-RO →  = | <> | < | <= | > | >=
-
-
-Digit  → 0 | 1 | … | 9
-
-Character → AlphaNumeric | IO | RO | SpecialChar | Quotation | ArithmeticOP 
-
-Quotation →` 
-
-AlphaNumeric → (Und |Letter | Integer)
-
-Letter → A|B|C|...|Z   |    a|b|c|...|z 
-
-ArithmeticOP → + | - | * | / | %
-
-SpecialChar → |  |  ;  | :  | `  |  (  |  ) | @ 
-
-Und → _ 
-
+.ru is our file extension abbreviation of "Roman Urdu" for this Compiler
+This readMe contains Phases that the parser has been implemented in.
 
 ## Steps to run 
 - cd into main to run the make file;
 - make 
 - ./a.out
 
+## Grammar 
+We start by defining Regular Definition 
+
+
+
+
+#### Implementation
 
 ### PHASE 1
 
@@ -66,61 +37,11 @@ occur without a space
 
 ## Parser 
 
-CFG
+Context Free Grammar is given in CFG.txt
 
-Program →  D Program | ^ 
+### PHASE 3
 
-D → Var | Function 
-
-Var → Code 
-
-Code → Statement Code | If Code | While Code | ^
-
-
-
-Statement → Stmt Comment
-Stmt → Initialization | Declaration | Input | Output | Return
-
-Koment->Comment | ^
-
-
-Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
-FuncT -> khali | adad 
-PL → ID @ adad MPL  | ^
-MPL → | PL | ^
-
-
-Initialization →  Declaration := Val;
-Val → ID | Integer | Exp
-Declaration →  rakho ID @ adad ;
-
-
-Input → lo   InputMsg  >> ID   
-InputMsg → ^ | << String 
-
-Output →  dekhao <<  OutVal MoreOut 
-MoreOut → << OutVal MoreOut | ^
-OutVal → String | Val 
-
-
-Return-> wapis bhaijo Val
-
-
-
-----------------
-
-IF    →  agar Condition to phir karo Koment Code WG WP bas karo Koment
-WG  →  warna agar Koment Condition to phir Koment Code | ^
-WP  →  warna phir Koment  Code | ^
-
-Condition → Exp  RO  Exp  
-
-Exp -> T - Exp | T + Exp | T
-T-> L %  T | L /  T | L* T | L 
-L-> ID | Integer | ( Exp )
-
-While →  jab tak ( Condition ) karo Koment  Code bas karo Koment
-
+## Generating Three Address code 
 
 
 

@@ -1,0 +1,70 @@
+IF    →  agar ( Condition ) to phir karo { 
+lnTrue= n ;
+emit ( “if” + Condition.v + goto + __ ) ;
+lnFalse= n;
+Emit ( “goto” + __ )
+BackPatch(lnTrue)
+} 
+Koment
+Code { 
+IF_end= ln;
+emit ( goto __)
+BackPatch(lnFalse) }
+WG 
+WP 
+bas karo 
+{ 
+BackPatch( IF_end )
+BackPatch( WG.val) 
+}
+Koment
+WG  →  warna agar Condition to phir Koment {
+lnTrue_= n;
+emit ( “if” + Condition.v + goto + __ ) ;
+lnFalse_ = n;
+emit( goto __)
+BackPatch(lnTrue_) 
+ } 
+Code  { 
+WG.v= ln;  // storing the current line number for Branch Ending
+emit (goto __ )
+BackPatch(lnFalse_)
+ }
+WG  →  ^
+WP  →  warna phir Koment  Code 
+WP  →   ^
+
+
+
+
+
+
+Return-> wapis bhaijo Val { emit (“ret” + Val.v) }
+
+// Todo : Add cascading to it
+
+Input → lo   InputMsg  >> ID { emit(“in”+ID.v+”\n”) }   
+InputMsg → ^ 
+InputMsg → << String  { emit ( “out” +String .v +”\n”}
+
+
+Output →  dekhao <<  OutVal  { emit ( “out” + OutVal.v +”\n”} MoreOut 
+MoreOut → << OutVal MoreOut { emit (  “out” + OutVal.v +”\n”} }  
+MoreOut →^
+OutVal → String { String.lex } | Val { Val.v }
+
+Condition → id  RO  id    { Condition.Value = id.val + Ro.lex + Exp.val} 
+
+Note:  Backpatch has global access to ln, so it patches current line number at the parameter passed to it 
+
+While →  jab tak ( Condition )  karo Koment   
+{  
+lnTrue = n ;
+emit (“if” + Condition.Value goto __  ); 
+lnFalse = n;
+Emit (goto __ ) 
+BackPatch(lnTrue)} 
+Code  
+{ emit( “goto” + lnTrue) }
+bas karo { BackPatch(lnFalse) } 
+Koment

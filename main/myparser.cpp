@@ -470,18 +470,21 @@ void parser::IF()
     Koment();
     DecreaseIndent();
     Code();
+    int IF_end =ln;
     DecreaseIndent();
-    WG();
+    int IF_end_ = WG();
     DecreaseIndent();
     WP();
     DecreaseIndent();
     expect(TokenType::bas);
     expect(TokenType::karo);
+    //  BackPatch(IF_end);
+    // backpatch(IF_end_);
     Koment();
     DecreaseIndent();
 }
 // Warna Agar --> else if
-void parser::WG()
+int parser::WG()
 {
     PrintAndIncreaseIndent("WG()");
     if (_lexer.peek(1).tokenType == TokenType::warna)
