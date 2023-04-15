@@ -39,12 +39,21 @@ string testreserved[] = {
     "Assignment_OP"
 
 };
+
+void emit(const char *filename, const string &text)
+{
+    ofstream file(filename, ios_base::app);
+    file << text << "\n";
+}
+
 void parser::syntax_error()
 {
     // cout << "SYNTAX ERROR\n token expected";
     // _lexer.peek(1).Print();
     exit(1);
 }
+
+
 
 // match function
 token parser::expect(TokenType expected_type)
@@ -59,7 +68,7 @@ token parser::expect(TokenType expected_type)
     }
     PrintAndIncreaseIndent(testreserved[(int)expected_type]);
     DecreaseIndent();
-  
+
     return t;
 }
 parser::parser(const char filename[])
@@ -99,6 +108,10 @@ void parser::PrintAndIncreaseIndent(string s)
     indent += 2;
 }
 
+
+
+
+
 void parser::Program()
 {
 
@@ -119,7 +132,7 @@ void parser::Program()
         if (_lexer.peek(1).tokenType == TokenType::END_OF_FILE)
         {
             // expect(TokenType::END_OF_FILE);
-            cout << "Program is correct now2\n";
+            cout << "Program is correct now\n";
             parser::resetPointer();
             return;
         }
@@ -227,21 +240,25 @@ void parser::VarType()
 void parser::Variable()
 {
     PrintAndIncreaseIndent("Variable");
+
     expect(TokenType::rakho);
-    if (_lexer.peek(1).tokenType == TokenType::ID ){
+    if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
         std::string varName = _lexer.peek(1).lexeme;
-        this->symbolTable[varName] ="ADAD";
+        this->symbolTable[varName] = "ADAD";
     }
+    string id =_lexer.peek(1).lexeme;
+    //cout << "id is " << id << endl;
     expect(TokenType::ID);
     // matchAscii('@');
     // expect(TokenType::adad);
     VarType();
     DecreaseIndent();
-    R();
+    R(id);
     DecreaseIndent();
 }
 
-void parser::R()
+void parser::R(string id)
 {
     PrintAndIncreaseIndent("R");
     if (_lexer.peek(1).tokenType == TokenType::Assignment_OP)
@@ -249,17 +266,15 @@ void parser::R()
         // if we give this a token type
         expect(TokenType::Assignment_OP);
         Val();
+        //yahan likhna 
         DecreaseIndent();
     }
-    else if (_lexer.peek(1).tokenType == TokenType::chalao)
-    { // koi function chal raha hai agay
-        expect(TokenType::chalao);
-        expect(TokenType::ID);
-        matchAscii('(');
-    }
-    else
-    {
+    else     {
+         // symbol table mei add karna hai
+        //expect(TokenType::koment);
         return;
+       
+
     }
 }
 void parser::Val()
@@ -319,7 +334,17 @@ void parser::Stmt()
         parser::syntax_error();
     }
 }
+void parser::chalao ()
+{
+    PrintAndIncreaseIndent("chalao");
+    expect(TokenType::ID);
+    matchAscii('(');
+    parser::PLF();
+    matchAscii(')');
+    DecreaseIndent();
 
+
+}
 void parser::InputMsg()
 {
     PrintAndIncreaseIndent("InputMsg()");
@@ -371,15 +396,13 @@ void parser::Moreparams()
     }
 }
 
-void parser::ShowSymbolTable(){
+void parser::ShowSymbolTable()
+{
 
-    cout<< "-----Symbol table ----- \n";
+    cout << "-----Symbol table ----- \n";
     for (auto x : this->symbolTable)
-    cout << x.first << " " << 
-            x.second << endl;   
-
+        cout << x.first << " " << x.second << endl;
 }
-
 
 // Parameter list functions
 void parser::PLF()
@@ -470,9 +493,9 @@ void parser::IF()
     Koment();
     DecreaseIndent();
     Code();
-    int IF_end =ln;
+    //int IF_end = ln;
     DecreaseIndent();
-    int IF_end_ = WG();
+    WG();
     DecreaseIndent();
     WP();
     DecreaseIndent();
@@ -484,7 +507,7 @@ void parser::IF()
     DecreaseIndent();
 }
 // Warna Agar --> else if
-int parser::WG()
+void parser::WG()
 {
     PrintAndIncreaseIndent("WG()");
     if (_lexer.peek(1).tokenType == TokenType::warna)
@@ -551,15 +574,13 @@ void parser::MarkaziOrNot()
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
         std::string FuncName = _lexer.peek(1).lexeme;
-        this->symbolTable[FuncName] ="FUNC";
+        this->symbolTable[FuncName] = "FUNC";
         expect(TokenType::ID);
-
-        
     }
     else if (_lexer.peek(1).tokenType == TokenType::markazi)
     {
         expect(TokenType::markazi);
-        this->symbolTable["MARKAZI"] ="FUNC";
+        this->symbolTable["MARKAZI"] = "FUNC";
     }
     else
     {

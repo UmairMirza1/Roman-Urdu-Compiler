@@ -34,7 +34,7 @@ public:
     void WHILE();
     void Condition();
     void Exp();
-    int WG();
+    void WG();
     void WP();
     void Stmt();
     void Input();
@@ -47,7 +47,7 @@ public:
     void T();
     void L();
     void RO();
-    void R();
+    void R(string id);
     void PLF();
     void FuncMain();
     void Cascading();
@@ -57,5 +57,6 @@ public:
     void VarType();
     void MarkaziOrNot();
     void ShowSymbolTable();
+    void chalao();
 };
 #endif
