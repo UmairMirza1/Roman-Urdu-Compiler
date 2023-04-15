@@ -1,0 +1,13 @@
+x = a
+y = 0
+param var
+call func 1,t0
+y = t0
+param var
+param 0
+call func 2,t1
+y2 = t1
+out `Enter the number`
+in num
+out `munfi number daal diya\n`
+out po

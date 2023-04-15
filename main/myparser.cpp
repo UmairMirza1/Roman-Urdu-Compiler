@@ -1,12 +1,22 @@
 #include "myparser.h"
 
+int Variable_Count = 0;
+int address = 0;
+string emitLine ="";
 
 namespace constants
 {
     const string TAC = "TAC.txt";
     const string SYMBOL_TABLE = "symbol_table.txt";
+}
 
-} 
+string newTemp()
+{
+    string var_name = "t" + to_string(Variable_Count);
+    Variable_Count++;
+    return var_name;
+}
+
 string testreserved[] = {
     "END_OF_FILE",
     "ERROR",
@@ -47,12 +57,6 @@ string testreserved[] = {
 
 };
 
-// void emit(const char *filename, const string &text)
-// {
-//     ofstream file(filename, ios_base::app);
-//     file << text << "\n";
-// }
-
 void emit(const string filename, const string &text)
 {
     ofstream file(filename, ios_base::app);
@@ -61,8 +65,8 @@ void emit(const string filename, const string &text)
 
 void parser::syntax_error()
 {
-    // cout << "SYNTAX ERROR\n token expected";
-    // _lexer.peek(1).Print();
+    cout << "SYNTAX ERROR\n token expected";
+    _lexer.peek(1).Print();
     exit(1);
 }
 
@@ -85,7 +89,13 @@ token parser::expect(TokenType expected_type)
 parser::parser(const char filename[])
 {
     _lexer = lexer(filename);
+    // Deleting the TAC file if it exists so that it can be created again
+    remove(constants::TAC.c_str());
+    remove(constants::SYMBOL_TABLE.c_str());
 }
+
+
+
 void parser::readAndPrintAllInput() // read and print allinputs (provided)
 {
     token t;
@@ -259,8 +269,8 @@ void parser::Variable()
     expect(TokenType::ID);
     VarType();
     DecreaseIndent();
-    // * { R.id = Id.lex }
-    R(id);
+
+    R(id); // * { R.id = Id.lex }
     DecreaseIndent();
 }
 
@@ -275,8 +285,8 @@ void parser::R(string id)
         string Val_v = Val();
         // *     { emit(R.id+”=”+ Val.v);
         // *     R.v =SymbolTable.add(R.id, INT);  }
-        string EmitLine = id + " = " + Val_v;
-        emit(constants::TAC, EmitLine);
+        emitLine = id + " = " + Val_v;
+        emit(constants::TAC, emitLine);
         DecreaseIndent();
     }
     else
@@ -305,6 +315,7 @@ string parser::Val()
     else if (_lexer.peek(1).tokenType == TokenType::chalao)
     {
         PrintAndIncreaseIndent("chalao");
+
         string Val_v = parser::chalao();
         DecreaseIndent();
         return Val_v; // * { Val.v = Chalao.v }
@@ -315,17 +326,6 @@ string parser::Val()
         expect(TokenType::ID);
         return Val_v;
     }
-}
-
-string parser::chalao()
-{
-
-    expect(TokenType::chalao);
-    expect(TokenType::ID);
-    matchAscii('(');
-    PLF();
-    DecreaseIndent();
-    matchAscii(')');
 }
 
 void parser::Stmt()
@@ -358,54 +358,69 @@ void parser::Stmt()
     }
 }
 
-void parser::InputMsg()
+string parser::chalao()
 {
-    PrintAndIncreaseIndent("InputMsg()");
-    if (_lexer.peek(1).tokenType == TokenType::Output)
-    {
-        expect(TokenType::Output);
-        expect(TokenType::string);
-    }
-    else
-    {
-        return;
-    }
+
+    expect(TokenType::chalao);
+    string ID = _lexer.peek(1).lexeme;
+    expect(TokenType::ID);
+    matchAscii('(');
+    int PLF_i = 0; // *  {   PLF.i=0;   }
+    int PLF_v = PLF(PLF_i);
+    string var = newTemp();
+    emitLine = "call " + ID + " " + to_string(PLF_v) + "," + var;
+    emit(constants::TAC, emitLine); // *{ PLF.i=0; }
+    DecreaseIndent();
+    matchAscii(')');
+    return var;
 }
 
-void parser::Outval()
+// Parameter list functions
+int parser::PLF(int i)
 {
-    PrintAndIncreaseIndent("Outval");
-    if (_lexer.peek(1).tokenType == TokenType::string)
+    PrintAndIncreaseIndent("PLF()");
+    if (_lexer.peek(1).tokenType == TokenType::ID)
     {
-        expect(TokenType::string);
-    }
-    else if (_lexer.peek(1).tokenType == TokenType::ID)
-    {
+        string id = _lexer.peek(1).lexeme;
         expect(TokenType::ID);
+        emit(constants::TAC, "param " + id);
+        int PLF_i = i + 1;
+        int Plf_v= MPLF(PLF_i);
+        DecreaseIndent();
+        return Plf_v;
     }
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
+        string id = _lexer.peek(1).lexeme;
         expect(TokenType::Digit);
+        emit(constants::TAC, "param " + id);
+        int PLF_i = i + 1;
+        int Plf_v= MPLF(PLF_i);
+        DecreaseIndent();
+        return Plf_v;
     }
     else
     {
-        syntax_error();
+        return i; // *  {PLF.v = PLf.i}
     }
 }
 
-void parser::Moreparams()
+int parser::MPLF(int i)
 {
-    PrintAndIncreaseIndent("Moreparams()");
+    PrintAndIncreaseIndent("MPLF()");
 
     if (_lexer.peek(1).lexeme[0] == '|')
     {
         matchAscii('|');
-        PLF();
+        int PLF_i = i;
+        int PLF_v =PLF(PLF_i);
         DecreaseIndent();
+        return PLF_v;
     }
     else
     {
-        return;
+        return i; // *  {MPLF.v = PLF.v}
+       
     }
 }
 
@@ -417,71 +432,50 @@ void parser::ShowSymbolTable()
         cout << x.first << " " << x.second << endl;
 }
 
-// Parameter list functions
-void parser::PLF()
-{
-    PrintAndIncreaseIndent("PLF()");
-    if (_lexer.peek(1).tokenType == TokenType::ID)
-    {
-        expect(TokenType::ID);
-        Moreparams();
-        DecreaseIndent();
-    }
-    else if (_lexer.peek(1).tokenType == TokenType::Digit)
-    {
-        expect(TokenType::Digit);
-        Moreparams();
-        DecreaseIndent();
-    }
-    else
-    {
-    }
-}
+// void parser::Input()
+// {
+//     PrintAndIncreaseIndent("Input()");
+//     expect(TokenType::lo);
+//     InputMsg();
+//     DecreaseIndent();
+//     expect(TokenType::Input);
+//     expect(TokenType::ID);
+// }
 
-void parser::Input()
-{
-    PrintAndIncreaseIndent("Input()");
-    expect(TokenType::lo);
-    InputMsg();
-    DecreaseIndent();
-    expect(TokenType::Input);
-    expect(TokenType::ID);
-}
+// void parser::Cascading()
+// {
+//     PrintAndIncreaseIndent("Cascading()");
+//     if (_lexer.peek(1).tokenType == TokenType::Output)
+//     {
+//         expect(TokenType::Output);
+//         Outval();
+//         DecreaseIndent();
+//         Cascading();
+//         DecreaseIndent();
+//     }
+//     else
+//     {
+//         return;
+//     }
+// }
 
-void parser::Cascading()
-{
-    PrintAndIncreaseIndent("Cascading()");
-    if (_lexer.peek(1).tokenType == TokenType::Output)
-    {
-        expect(TokenType::Output);
-        Outval();
-        DecreaseIndent();
-        Cascading();
-        DecreaseIndent();
-    }
-    else
-    {
-        return;
-    }
-}
-
-void parser::Output()
-{
-    PrintAndIncreaseIndent("Output()");
-    //  dekhao << x << ` `;
-    if (_lexer.peek(1).tokenType == TokenType::dekhao)
-    {
-        expect(TokenType::dekhao);
-        expect(TokenType::Output);
-        Outval();
-        DecreaseIndent();
-        Cascading();
-        DecreaseIndent();
-    }
-    {
-        return;
-    }
-}
+// void parser::Output()
+// {
+//     PrintAndIncreaseIndent("Output()");
+//     //  dekhao << x << ` `;
+//     if (_lexer.peek(1).tokenType == TokenType::dekhao)
+//     {
+//         expect(TokenType::dekhao);
+//         expect(TokenType::Output);
+//         Outval();
+//         DecreaseIndent();
+//         Cascading();
+//         DecreaseIndent();
+//     }
+//     {
+//         return;
+//     }
+// }
 void parser::Return()
 {
     PrintAndIncreaseIndent("Return()");
@@ -693,6 +687,125 @@ void parser::FuncT()
     }
 }
 
+void parser::Input()
+{
+    PrintAndIncreaseIndent("Input()");
+    expect(TokenType::lo);
+    InputMsg();
+    DecreaseIndent();
+    //{ emit(“in”+ID.v+”\n”) } 
+    expect(TokenType::Input);
+    string inputID=_lexer.peek(1).lexeme;
+    expect(TokenType::ID);
+    string EmitLine="in " +inputID;
+    emit(constants::TAC, EmitLine);
+}
+
+void parser::InputMsg()
+{
+    PrintAndIncreaseIndent("InputMsg()");
+    if (_lexer.peek(1).tokenType == TokenType::Output)
+    {
+        expect(TokenType::Output);
+        string inputstr = _lexer.peek(1).lexeme;
+        expect(TokenType::string);
+        //{ emit (“out” +String .v +”\n”) }
+        string EmitLine = "out "+ inputstr;
+        emit(constants::TAC, EmitLine);
+    }
+    else
+    {
+        return;
+    }
+}
+
+void parser::Output()
+{
+    PrintAndIncreaseIndent("Output()");
+    //  dekhao << x << ` `;
+    if (_lexer.peek(1).tokenType == TokenType::dekhao)
+    {
+        expect(TokenType::dekhao);
+        expect(TokenType::Output);
+        string outval=Outval();
+        // { emit (“out” + OutVal.v +”\n” ) }
+        string EmitLine="out "+outval;
+        emit(constants::TAC,EmitLine); 
+        DecreaseIndent();
+        Cascading();
+        DecreaseIndent();
+    }
+    {
+        return;
+    }
+}
+
+void parser::Cascading()
+{
+    PrintAndIncreaseIndent("Cascading()");
+    if (_lexer.peek(1).tokenType == TokenType::Output)
+    {
+        expect(TokenType::Output);
+        string outval=Outval();
+        // { emit (“out” + OutVal.v +”\n” ) }
+        string EmitLine="out "+outval;
+        emit(constants::TAC,EmitLine);
+        DecreaseIndent();
+        Cascading();
+        DecreaseIndent();
+    }
+    else
+    {
+        return;
+    }
+}
+
+string parser::Outval()
+{
+    PrintAndIncreaseIndent("Outval");
+    if (_lexer.peek(1).tokenType == TokenType::string)
+    {
+        string outstr=_lexer.peek(1).lexeme;
+        expect(TokenType::string);
+        return outstr;
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::ID)
+    {
+        string outid=_lexer.peek(1).lexeme;
+        expect(TokenType::ID);
+        return outid;
+    }
+    else if (_lexer.peek(1).tokenType == TokenType::Digit)
+    {
+        string outdigit=_lexer.peek(1).lexeme;
+        expect(TokenType::Digit);
+        return outdigit;
+    }
+    else
+    {
+        syntax_error();
+    }
+} 
+
+/*
+void parser::Output()
+{
+    PrintAndIncreaseIndent("Output()");
+    //  dekhao << x << ` `;
+    if (_lexer.peek(1).tokenType == TokenType::dekhao)
+    {
+        expect(TokenType::dekhao);
+        expect(TokenType::Output);
+        Outval();
+        DecreaseIndent();
+        Cascading();
+        DecreaseIndent();
+    }
+    {
+        return;
+    }
+}
+*/
 void parser::Condition()
 {
     PrintAndIncreaseIndent("Condition()");
