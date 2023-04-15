@@ -1,3 +1,120 @@
+TRANSLATION SCHEME
+
+
+Program →  D Program | ^ 
+
+D → Code | Function | Koment 
+
+Code → Statement Code | If Code | While Code | ^
+
+Statement → Stmt Comment
+Stmt → Variable | Input | Output | Return | Chalao
+
+Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
+FuncT -> khali | adad 
+PL → ID @ adad MPL  | ^
+MPL → | PL   | ^
+
+==============Rakho=========================
+Variable → rakho ID Type { R.id = Id.lex } R 
+Type → @ adad  | ^  
+R → := Val { 
+emit(R.id+”=”+ Val.v); 
+R.v =SymbolTable.add(R.id, INT);  }
+|  ^ {  R.v = SymbolTable.add(R.id, INT);  }
+w
+Val → ID { Val.v=ID.lex; }
+ | Integer { Val.v=Integer.lex; }
+ | Exp { Val.v=Exp.v; } 
+| Chalao {Val.v=Chalao.v}
+
+========================================
+
+Condition → Exp RO  Exp  { Condition.Value =  Exp.ex + Ro.lex + Exp.ex } 
+
+========================================     
+
+
+
+
+Exp → T - Exp1 {
+var=newTemp();
+SymbolTable.add(var, INT);
+emit(var+’=’+T.val+’-’+Exp1.val);
+Exp.val=var   
+Exp.ex = T.val + “-” + exp1.ex 
+}
+
+                          
+Exp → T + Exp2{
+var=newTemp();
+SymbolTable.add(var, INT);
+emit(var+’=’+T.val+’+’+Exp2.val);
+Exp.val=var; 
+Exp.ex = T.val + “-” + exp1.ex 
+}
+
+Exp → T {Exp.val=T.val;}
+    
+T →  L% T1 {
+var=newTemp();
+SymbolTable.add(var, INT);
+emit(var+’=’+L.val+’%’+T1.val);
+T.val=var;
+T.ex=L.val+”%”+T1.ex;
+}
+                    
+T →  L /  T2 {
+var=newTemp();
+SymbolTable.add(var, INT);
+emit(var+’=’+L.val+’/’+T2.val);
+T.val=var;
+T.ex=L.val+”/”+T2.ex;
+}
+                    
+                    
+T →  L*  T3 {
+var=newTemp();
+SymbolTable.add(var, INT);
+emit(var+’=’+L.val+’*’+T3.val);
+T.val=var;
+T.ex=L.val+”*”+T3.ex;
+ }
+  
+T →  L  {T.val=L.val; T.ex=L.val}
+L → ID  { L.val=ID.lex; }
+L → Integer   { L.val=Integer.lex; }
+
+=======================================
+
+Chalao →  chalao ID { PLF.i=0; } ( PLF ) { 
+var=newTemp(); 
+emit (“call” + ID.lex + PLF.v + “,” +var);
+Chalao.v = var;
+}
+PLF → ID {
+ emit(“param ”+ ID.lex);
+ PLF.i = PLF.i +1;   // +1
+ MPLF.i = PLF.i;
+ } MPLF { PLF.v = MPLF.v; }  
+
+
+PLF → Integer {
+emit (“param”+Integer.lex);
+PLF.i=PLF.i+1; 
+MPLF.i = PLF.i;
+} MPLF { PLF.v =MPLF.v; } 
+PLF → ^  { PLF.v = PLF.i ;}
+MPLF → | { PLF.i = MPLF.i ;} PLF  {MPLF.v = PLF.v;}    
+MPLF → ^ { MPLF.v = MPLF.i ;} 
+
+
+========================================
+
+Koment → Comment  | ^
+
+========================================
+
 IF    →  agar ( Condition ) to phir karo { 
 lnTrue= n ;
 emit ( “if” + Condition.v + goto + __ ) ;
@@ -9,13 +126,14 @@ Koment
 Code { 
 IF_end= ln;
 emit ( goto __)
-BackPatch(lnFalse) }
+BackPatch(lnFalse) 
+}
 WG 
 WP 
 bas karo 
 { 
 BackPatch( IF_end )
-BackPatch( WG.val) 
+BackPatch(WG.val) 
 }
 Koment
 WG  →  warna agar Condition to phir Koment {
@@ -34,7 +152,7 @@ WG  →  ^
 WP  →  warna phir Koment  Code 
 WP  →   ^
 
-
+========================================
 
 
 
@@ -45,15 +163,14 @@ Return-> wapis bhaijo Val { emit (“ret” + Val.v) }
 
 Input → lo   InputMsg  >> ID { emit(“in”+ID.v+”\n”) }   
 InputMsg → ^ 
-InputMsg → << String  { emit ( “out” +String .v +”\n”}
+InputMsg → << String  { emit (“out” +String .v +”\n”) }
 
 
-Output →  dekhao <<  OutVal  { emit ( “out” + OutVal.v +”\n”} MoreOut 
-MoreOut → << OutVal MoreOut { emit (  “out” + OutVal.v +”\n”} }  
+Output →  dekhao <<  OutVal  { emit (“out” + OutVal.v +”\n” ) } MoreOut 
+MoreOut → << OutVal MoreOut { emit ( “out” + OutVal.v +”\n” )  }  
 MoreOut →^
 OutVal → String { String.lex } | Val { Val.v }
 
-Condition → id  RO  id    { Condition.Value = id.val + Ro.lex + Exp.val} 
 
 Note:  Backpatch has global access to ln, so it patches current line number at the parameter passed to it 
 
@@ -68,3 +185,5 @@ Code
 { emit( “goto” + lnTrue) }
 bas karo { BackPatch(lnFalse) } 
 Koment
+
+
