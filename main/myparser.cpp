@@ -432,50 +432,6 @@ void parser::ShowSymbolTable()
         cout << x.first << " " << x.second << endl;
 }
 
-// void parser::Input()
-// {
-//     PrintAndIncreaseIndent("Input()");
-//     expect(TokenType::lo);
-//     InputMsg();
-//     DecreaseIndent();
-//     expect(TokenType::Input);
-//     expect(TokenType::ID);
-// }
-
-// void parser::Cascading()
-// {
-//     PrintAndIncreaseIndent("Cascading()");
-//     if (_lexer.peek(1).tokenType == TokenType::Output)
-//     {
-//         expect(TokenType::Output);
-//         Outval();
-//         DecreaseIndent();
-//         Cascading();
-//         DecreaseIndent();
-//     }
-//     else
-//     {
-//         return;
-//     }
-// }
-
-// void parser::Output()
-// {
-//     PrintAndIncreaseIndent("Output()");
-//     //  dekhao << x << ` `;
-//     if (_lexer.peek(1).tokenType == TokenType::dekhao)
-//     {
-//         expect(TokenType::dekhao);
-//         expect(TokenType::Output);
-//         Outval();
-//         DecreaseIndent();
-//         Cascading();
-//         DecreaseIndent();
-//     }
-//     {
-//         return;
-//     }
-// }
 void parser::Return()
 {
     PrintAndIncreaseIndent("Return()");
