@@ -53,8 +53,6 @@ void parser::syntax_error()
     exit(1);
 }
 
-
-
 // match function
 token parser::expect(TokenType expected_type)
 {
@@ -107,10 +105,6 @@ void parser::PrintAndIncreaseIndent(string s)
     cout << str << s << endl;
     indent += 2;
 }
-
-
-
-
 
 void parser::Program()
 {
@@ -247,8 +241,8 @@ void parser::Variable()
         std::string varName = _lexer.peek(1).lexeme;
         this->symbolTable[varName] = "ADAD";
     }
-    string id =_lexer.peek(1).lexeme;
-    //cout << "id is " << id << endl;
+    string id = _lexer.peek(1).lexeme;
+    // cout << "id is " << id << endl;
     expect(TokenType::ID);
     // matchAscii('@');
     // expect(TokenType::adad);
@@ -265,16 +259,16 @@ void parser::R(string id)
     {
         // if we give this a token type
         expect(TokenType::Assignment_OP);
+
         Val();
-        //yahan likhna 
+
         DecreaseIndent();
     }
-    else     {
-         // symbol table mei add karna hai
-        //expect(TokenType::koment);
-        return;
-       
+    else
+    {
+        // symbol table mei add karna hai
 
+        return;
     }
 }
 void parser::Val()
@@ -334,17 +328,7 @@ void parser::Stmt()
         parser::syntax_error();
     }
 }
-void parser::chalao ()
-{
-    PrintAndIncreaseIndent("chalao");
-    expect(TokenType::ID);
-    matchAscii('(');
-    parser::PLF();
-    matchAscii(')');
-    DecreaseIndent();
 
-
-}
 void parser::InputMsg()
 {
     PrintAndIncreaseIndent("InputMsg()");
@@ -493,7 +477,7 @@ void parser::IF()
     Koment();
     DecreaseIndent();
     Code();
-    //int IF_end = ln;
+    // int IF_end = ln;
     DecreaseIndent();
     WG();
     DecreaseIndent();
