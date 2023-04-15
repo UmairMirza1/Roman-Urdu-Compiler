@@ -40,7 +40,7 @@ occur without a space
 Context Free Grammar is given in CFG.txt
 
 ### PHASE 3
-
+## Translation scheme
 Translation Scheme is given in Translation scheme.txt
 
 
