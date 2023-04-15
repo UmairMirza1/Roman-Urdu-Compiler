@@ -1,5 +1,12 @@
 #include "myparser.h"
 
+
+namespace constants
+{
+    const string TAC = "TAC.txt";
+    const string SYMBOL_TABLE = "symbol_table.txt";
+
+} 
 string testreserved[] = {
     "END_OF_FILE",
     "ERROR",
@@ -40,7 +47,13 @@ string testreserved[] = {
 
 };
 
-void emit(const char *filename, const string &text)
+// void emit(const char *filename, const string &text)
+// {
+//     ofstream file(filename, ios_base::app);
+//     file << text << "\n";
+// }
+
+void emit(const string filename, const string &text)
 {
     ofstream file(filename, ios_base::app);
     file << text << "\n";
@@ -244,10 +257,9 @@ void parser::Variable()
     string id = _lexer.peek(1).lexeme;
     // cout << "id is " << id << endl;
     expect(TokenType::ID);
-    // matchAscii('@');
-    // expect(TokenType::adad);
     VarType();
     DecreaseIndent();
+    // * { R.id = Id.lex }
     R(id);
     DecreaseIndent();
 }
@@ -260,8 +272,11 @@ void parser::R(string id)
         // if we give this a token type
         expect(TokenType::Assignment_OP);
 
-        Val();
-
+        string Val_v = Val();
+        // *     { emit(R.id+”=”+ Val.v);
+        // *     R.v =SymbolTable.add(R.id, INT);  }
+        string EmitLine = id + " = " + Val_v;
+        emit(constants::TAC, EmitLine);
         DecreaseIndent();
     }
     else
@@ -271,34 +286,48 @@ void parser::R(string id)
         return;
     }
 }
-void parser::Val()
+
+string parser::Val()
 {
     PrintAndIncreaseIndent("Val");
     if (_lexer.peek(2).lexeme[0] == '-' || _lexer.peek(2).lexeme[0] == '+' || _lexer.peek(2).lexeme[0] == '*' || _lexer.peek(2).lexeme[0] == '/' || _lexer.peek(2).lexeme[0] == '%')
     {
-        Expression();
+        string Val_v = Expression(); // * { Val.v = Expression.v }
         DecreaseIndent();
+        return Val_v;
     }
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
+        string Val_v = _lexer.peek(1).lexeme; // * { Val.v = Digit.v }
         expect(TokenType::Digit);
+        return Val_v;
     }
     else if (_lexer.peek(1).tokenType == TokenType::chalao)
     {
-        expect(TokenType::chalao);
-        expect(TokenType::ID);
-        matchAscii('(');
-        PLF();
+        PrintAndIncreaseIndent("chalao");
+        string Val_v = parser::chalao();
         DecreaseIndent();
-        matchAscii(')');
-        // cout << "matched chalao ";
+        return Val_v; // * { Val.v = Chalao.v }
     }
     else if ((_lexer.peek(1).tokenType == TokenType::ID))
     {
-
+        string Val_v = _lexer.peek(1).lexeme; // * { Val.v = Digit.v }
         expect(TokenType::ID);
+        return Val_v;
     }
 }
+
+string parser::chalao()
+{
+
+    expect(TokenType::chalao);
+    expect(TokenType::ID);
+    matchAscii('(');
+    PLF();
+    DecreaseIndent();
+    matchAscii(')');
+}
+
 void parser::Stmt()
 {
     PrintAndIncreaseIndent("Stmt");
@@ -712,7 +741,7 @@ void parser::RO()
 // T-> L %  T | L /  T | L* T | L
 // L-> ID | Integer | ( Exp )
 
-void parser::Expression()
+string parser::Expression()
 {
     PrintAndIncreaseIndent("Expression()");
     if (_lexer.peek(2).lexeme[0] == '-')

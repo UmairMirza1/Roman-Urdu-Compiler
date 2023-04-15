@@ -42,8 +42,8 @@ public:
     void Return();
     void InputMsg();
     void Outval();
-    void Val();
-    void Expression();
+    string Val();
+    string Expression();
     void T();
     void L();
     void RO();
@@ -57,6 +57,6 @@ public:
     void VarType();
     void MarkaziOrNot();
     void ShowSymbolTable();
-    void chalao();
+    string chalao();
 };
 #endif
