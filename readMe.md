@@ -46,7 +46,6 @@ Translation Scheme is given in Translation scheme.txt
 
 
 
-
 # Final product
 ![image](https://user-images.githubusercontent.com/44190606/219964236-8f14b88a-d262-4351-b72f-f5b1aea464b3.png)
 
