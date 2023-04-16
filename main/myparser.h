@@ -2,13 +2,25 @@
 #define _PARSER_H_
 #include "lexer.h"
 #include <unordered_map>
-// for future additions
+
+struct mapElement
+{
+    std::string type;
+    std::string address;
+};
+
+struct ExpressionResult {
+    std::string RetVar;
+    std::string Exp;
+};
+
+
 class parser
 {
     lexer _lexer;
 
 public:
-    // id, type
+    // id, type , address
     std::unordered_map<std::string, std::string> symbolTable;
     bool flag = false;
     int indent = 0;
@@ -32,9 +44,9 @@ public:
     void Statement();
     void IF();
     void WHILE();
-    void Condition();
-    void Exp();
-    void WG();
+    string Condition();
+    ExpressionResult Exp();
+    int WG();
     void WP();
     void Stmt();
     void Input();
@@ -44,12 +56,14 @@ public:
     string Outval();
     string Val();
     string Expression();
-    void T();
+    string T();
+    string F();
     void L();
     void RO();
     void R(string id);
     int PLF(int i);
     void FuncMain();
+    string Q(string i);
     void Cascading();
     void DecreaseIndent();
     void PrintAndIncreaseIndent(string s);
@@ -57,6 +71,7 @@ public:
     void VarType();
     void MarkaziOrNot();
     void ShowSymbolTable();
+    string P(string i);
     string chalao();
 };
 #endif

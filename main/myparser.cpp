@@ -2,7 +2,10 @@
 
 int Variable_Count = 0;
 int address = 0;
-string emitLine ="";
+int lineNumber = 0;
+string emitLine = "";
+vector<string> lines;
+
 
 namespace constants
 {
@@ -10,6 +13,33 @@ namespace constants
     const string SYMBOL_TABLE = "symbol_table.txt";
 }
 
+void WriteVectorToFile(std::vector<std::string> vectors, std::string filename)
+{
+    std::ofstream file(filename);
+    if (file.is_open())
+    {
+        for (const auto &vector : vectors)
+        {
+            file << vector;
+        }
+        file.close();
+    }
+    else
+    {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+    }
+}
+
+void Backpatch(int ReferenceLine)
+
+{
+    if (ReferenceLine < 0)
+        return;
+    string LinePatch = to_string(lineNumber);
+    string Patch = lines[ReferenceLine];
+    Patch = Patch.substr(0, Patch.size() - 1) + " " + LinePatch + " \n";
+    lines[ReferenceLine] = Patch;
+}
 string newTemp()
 {
     string var_name = "t" + to_string(Variable_Count);
@@ -59,8 +89,14 @@ string testreserved[] = {
 
 void emit(const string filename, const string &text)
 {
-    ofstream file(filename, ios_base::app);
-    file << text << "\n";
+    // ofstream file(filename, ios_base::app);
+    // file << lineNumber << ". " <<  text << "\n";
+
+    // I have done this to optimize the backPatch
+
+    string string_to_emit = to_string(lineNumber) + ". " + text + "\n";
+    lines.push_back(string_to_emit);
+    lineNumber++;
 }
 
 void parser::syntax_error()
@@ -93,8 +129,6 @@ parser::parser(const char filename[])
     remove(constants::TAC.c_str());
     remove(constants::SYMBOL_TABLE.c_str());
 }
-
-
 
 void parser::readAndPrintAllInput() // read and print allinputs (provided)
 {
@@ -164,7 +198,7 @@ void parser::Program()
     }
     else
     {
-        cout << "here";
+        //cout << "here";
         return;
     }
 }
@@ -303,6 +337,7 @@ string parser::Val()
     if (_lexer.peek(2).lexeme[0] == '-' || _lexer.peek(2).lexeme[0] == '+' || _lexer.peek(2).lexeme[0] == '*' || _lexer.peek(2).lexeme[0] == '/' || _lexer.peek(2).lexeme[0] == '%')
     {
         string Val_v = Expression(); // * { Val.v = Expression.v }
+
         DecreaseIndent();
         return Val_v;
     }
@@ -385,7 +420,7 @@ int parser::PLF(int i)
         expect(TokenType::ID);
         emit(constants::TAC, "param " + id);
         int PLF_i = i + 1;
-        int Plf_v= MPLF(PLF_i);
+        int Plf_v = MPLF(PLF_i);
         DecreaseIndent();
         return Plf_v;
     }
@@ -395,7 +430,7 @@ int parser::PLF(int i)
         expect(TokenType::Digit);
         emit(constants::TAC, "param " + id);
         int PLF_i = i + 1;
-        int Plf_v= MPLF(PLF_i);
+        int Plf_v = MPLF(PLF_i);
         DecreaseIndent();
         return Plf_v;
     }
@@ -413,14 +448,13 @@ int parser::MPLF(int i)
     {
         matchAscii('|');
         int PLF_i = i;
-        int PLF_v =PLF(PLF_i);
+        int PLF_v = PLF(PLF_i);
         DecreaseIndent();
         return PLF_v;
     }
     else
     {
         return i; // *  {MPLF.v = PLF.v}
-       
     }
 }
 
@@ -437,7 +471,9 @@ void parser::Return()
     PrintAndIncreaseIndent("Return()");
     expect(TokenType::wapas);
     expect(TokenType::bhaijo);
+    string ID = _lexer.peek(1).lexeme;
     expect(TokenType::Digit);
+    emit(constants::TAC, "ret " + ID);
     // expect(TokenType::koment);
     // cout << "wapis jarhga hu n bhai jo" << endl;
 }
@@ -447,30 +483,40 @@ void parser::IF()
     PrintAndIncreaseIndent("IF()");
     expect(TokenType::agar);
     matchAscii('(');
+    // string Condition_v = Condition();
     Condition();
     DecreaseIndent();
     matchAscii(')');
     expect(TokenType::to);
     expect(TokenType::phir);
     expect(TokenType::karo);
+
+    int lnTrue = lineNumber;
+    emit(constants::TAC, "if Condition_v  goto");
+    int lnFalse = lineNumber;
+    emit(constants::TAC, "goto");
+    Backpatch(lnTrue);
     Koment();
     DecreaseIndent();
     Code();
-    // int IF_end = ln;
+    int IF_end = lineNumber;
+    emit(constants::TAC, "goto");
+    Backpatch(lnFalse);
     DecreaseIndent();
-    WG();
+    int WG_val = WG();
     DecreaseIndent();
     WP();
     DecreaseIndent();
     expect(TokenType::bas);
     expect(TokenType::karo);
-    //  BackPatch(IF_end);
-    // backpatch(IF_end_);
+
+    Backpatch(IF_end);
+    Backpatch(WG_val);
     Koment();
     DecreaseIndent();
 }
 // Warna Agar --> else if
-void parser::WG()
+int parser::WG()
 {
     PrintAndIncreaseIndent("WG()");
     if (_lexer.peek(1).tokenType == TokenType::warna)
@@ -484,12 +530,22 @@ void parser::WG()
         expect(TokenType::to);
         expect(TokenType::phir);
         Koment();
+        int lnTrue = lineNumber;
+        emit(constants::TAC, "if Condition_v goto");
+        int lnFalse = lineNumber;
+        emit(constants::TAC, "goto ");
+        Backpatch(lnTrue);
         Code();
+        int Wg_v = lineNumber;
+        emit(constants::TAC, "goto ");
+        Backpatch(lnFalse);
+
         DecreaseIndent();
+        return Wg_v;
     }
     else
     {
-        return;
+        return -1;
     }
 }
 
@@ -519,15 +575,24 @@ void parser::WHILE()
     expect(TokenType::tak);
     matchAscii('(');
     Condition();
+
     DecreaseIndent();
     matchAscii(')');
     expect(TokenType::karo);
     Koment();
     DecreaseIndent();
+
+    int lnTrue = lineNumber;
+    emit(constants::TAC, "if Cond goto ");
+    int lnFalse = lineNumber;
+    emit(constants::TAC, "goto ");
+    Backpatch(lnTrue);
     Code();
+    emit(constants::TAC, "goto " + to_string(lnTrue));
     DecreaseIndent();
     expect(TokenType::bas);
     expect(TokenType::karo);
+    Backpatch(lnFalse);
     Koment();
     DecreaseIndent();
 }
@@ -649,11 +714,11 @@ void parser::Input()
     expect(TokenType::lo);
     InputMsg();
     DecreaseIndent();
-    //{ emit(“in”+ID.v+”\n”) } 
+    //{ emit(“in”+ID.v+”\n”) }
     expect(TokenType::Input);
-    string inputID=_lexer.peek(1).lexeme;
+    string inputID = _lexer.peek(1).lexeme;
     expect(TokenType::ID);
-    string EmitLine="in " +inputID;
+    string EmitLine = "in " + inputID;
     emit(constants::TAC, EmitLine);
 }
 
@@ -666,7 +731,7 @@ void parser::InputMsg()
         string inputstr = _lexer.peek(1).lexeme;
         expect(TokenType::string);
         //{ emit (“out” +String .v +”\n”) }
-        string EmitLine = "out "+ inputstr;
+        string EmitLine = "out " + inputstr;
         emit(constants::TAC, EmitLine);
     }
     else
@@ -683,10 +748,10 @@ void parser::Output()
     {
         expect(TokenType::dekhao);
         expect(TokenType::Output);
-        string outval=Outval();
+        string outval = Outval();
         // { emit (“out” + OutVal.v +”\n” ) }
-        string EmitLine="out "+outval;
-        emit(constants::TAC,EmitLine); 
+        string EmitLine = "out " + outval;
+        emit(constants::TAC, EmitLine);
         DecreaseIndent();
         Cascading();
         DecreaseIndent();
@@ -702,10 +767,10 @@ void parser::Cascading()
     if (_lexer.peek(1).tokenType == TokenType::Output)
     {
         expect(TokenType::Output);
-        string outval=Outval();
+        string outval = Outval();
         // { emit (“out” + OutVal.v +”\n” ) }
-        string EmitLine="out "+outval;
-        emit(constants::TAC,EmitLine);
+        string EmitLine = "out " + outval;
+        emit(constants::TAC, EmitLine);
         DecreaseIndent();
         Cascading();
         DecreaseIndent();
@@ -721,19 +786,19 @@ string parser::Outval()
     PrintAndIncreaseIndent("Outval");
     if (_lexer.peek(1).tokenType == TokenType::string)
     {
-        string outstr=_lexer.peek(1).lexeme;
+        string outstr = _lexer.peek(1).lexeme;
         expect(TokenType::string);
         return outstr;
     }
     else if (_lexer.peek(1).tokenType == TokenType::ID)
     {
-        string outid=_lexer.peek(1).lexeme;
+        string outid = _lexer.peek(1).lexeme;
         expect(TokenType::ID);
         return outid;
     }
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
-        string outdigit=_lexer.peek(1).lexeme;
+        string outdigit = _lexer.peek(1).lexeme;
         expect(TokenType::Digit);
         return outdigit;
     }
@@ -741,28 +806,9 @@ string parser::Outval()
     {
         syntax_error();
     }
-} 
-
-/*
-void parser::Output()
-{
-    PrintAndIncreaseIndent("Output()");
-    //  dekhao << x << ` `;
-    if (_lexer.peek(1).tokenType == TokenType::dekhao)
-    {
-        expect(TokenType::dekhao);
-        expect(TokenType::Output);
-        Outval();
-        DecreaseIndent();
-        Cascading();
-        DecreaseIndent();
-    }
-    {
-        return;
-    }
 }
-*/
-void parser::Condition()
+
+string parser::Condition()
 {
     PrintAndIncreaseIndent("Condition()");
     Expression();
@@ -813,73 +859,101 @@ void parser::RO()
 string parser::Expression()
 {
     PrintAndIncreaseIndent("Expression()");
-    if (_lexer.peek(2).lexeme[0] == '-')
+    string T_v = T();
+    string E_v = P(T_v);
+    return E_v;
+}
+
+string parser::P(string i)
+{
+
+    PrintAndIncreaseIndent("P()");
+    if (_lexer.peek(1).lexeme[0] == '+')
     {
-        T();
-        DecreaseIndent();
-        matchAscii('-');
-        Expression();
-        DecreaseIndent();
-    }
-    else if (_lexer.peek(2).lexeme[0] == '+')
-    {
-        T();
-        DecreaseIndent();
         matchAscii('+');
-        Expression();
-        DecreaseIndent();
+        string T_v = T();
+        string var = newTemp();
+        emit(constants::TAC, var + "=" + i + "+" + T_v);
+        string P1_s = P(var);
+        return P1_s;
     }
+    else if (_lexer.peek(1).lexeme[0] == '-')
+    {
+        matchAscii('-');
+        string T_v = T();
+        string var = newTemp();
+        emit(constants::TAC, var + "=" + i + "-" + T_v);
+        string P1_s = P(var);
+        return P1_s;
+    }
+
     else
     {
-        T();
-        DecreaseIndent();
+        return i;
     }
 }
 
-void parser::T()
+string parser::T()
 {
     PrintAndIncreaseIndent("T()");
-    if (_lexer.peek(1).lexeme[0] == '%')
+    string F_v = F();
+    string T_v = Q(F_v);
+    return T_v;
+}
+
+string parser::Q(string i)
+{
+
+    PrintAndIncreaseIndent("Q()");
+    if (_lexer.peek(1).lexeme[0] == '*')
     {
-        L();
-        DecreaseIndent();
-        matchAscii('%');
-        T();
-        DecreaseIndent();
+        matchAscii('*');
+        string F_v = F();
+        string var = newTemp();
+        emit(constants::TAC, var + "=" + i + "*" + F_v);
+        string Q1_s = Q(var);
+        return Q1_s;
     }
     else if (_lexer.peek(1).lexeme[0] == '/')
     {
-        L();
-        DecreaseIndent();
         matchAscii('/');
-        T();
-        DecreaseIndent();
+        string F_v = F();
+        string var = newTemp();
+        emit(constants::TAC, var + "=" + i + "/" + F_v);
+        string Q1_s = Q(var);
+        return Q1_s;
     }
-    else if (_lexer.peek(1).lexeme[0] == '*')
+    else if (_lexer.peek(1).lexeme[0] == '%')
     {
-        L();
-        DecreaseIndent();
-        matchAscii('*');
-        T();
-        DecreaseIndent();
+        matchAscii('-');
+        string F_v = F();
+        string var = newTemp();
+        emit(constants::TAC, var + "=" + i + "%" + F_v);
+        string Q1_s = Q(var);
+        return Q1_s;
     }
+
     else
     {
-        L();
-        DecreaseIndent();
+        return i;
     }
 }
 
-void parser::L()
+string parser::F()
 {
-    PrintAndIncreaseIndent("L()");
+    PrintAndIncreaseIndent("F()");
     if (_lexer.peek(1).tokenType == TokenType::ID)
-    {
+    { 
+        cout<< "here \n";
+        string F_v = _lexer.peek(1).lexeme;
         expect(TokenType::ID);
+        return F_v;
     }
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
+        string F_v = _lexer.peek(1).lexeme;
         expect(TokenType::Digit);
+        return F_v;
     }
     else if (_lexer.peek(1).lexeme[0] == '(')
     {
@@ -909,25 +983,9 @@ void parser::matchAscii(int ascii)
 void parser::parse()
 {
     parser::Program();
+    for (const auto &str : lines)
+    {
+        std::cout << str << " ";
+    }
+    WriteVectorToFile(lines, constants::TAC);
 }
-
-// this function is for sample purposes only
-// bool parser::statements()
-// {
-//     //statements-- > COLON LPAREN start RPAREN
-//     if (_lexer.peek(1).tokenType == TokenType::COLON)
-//     {
-//         expect(TokenType::COLON);
-//         if (_lexer.peek(1).tokenType == TokenType::LPAREN)
-//         {
-//             expect(TokenType::LPAREN);
-//             start();
-//             if (_lexer.peek(1).tokenType == TokenType::RPAREN)
-//             {
-//                 expect(TokenType::RPAREN);
-//                 return true;
-//             }
-//         }
-//     }
-//     return false;
-// }
