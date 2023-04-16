@@ -11,7 +11,7 @@
 10. goto  14 
 11. out `yar 0 hai!\n`
 12. ret 0
-13. goto  26 
+13. goto 26 
 14. out `\nfibonacci series: `
 15. i = 1
 16. t1=i-1
