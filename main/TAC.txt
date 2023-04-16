@@ -1,34 +1,33 @@
-0. t0=y+z
-1. x = t0
-2. x = 0
-3. y = 0
-4. if n < 0 goto 6 
-5. goto 9 
-6. out `munfi number daal diya\n`
-7. ret 0
-8. goto 26 
-9. if n < 0 goto 11 
-10. goto  14 
-11. out `yar 0 hai!\n`
-12. ret 0
-13. goto 26 
-14. out `\nfibonacci series: `
-15. i = 1
-16. t1=i-1
-17. if t1 >= n goto 19 
-18. goto  26 
+1. t1=y+z
+2. x = t1
+3. x = 0
+4. y = 0
+5. if n < 0 goto 7 
+6. goto 10 
+7. out `munfi number daal diya\n`
+8. ret 0
+9. goto 26 
+10. if n < 0 goto 12 
+11. goto  15 
+12. out `yar 0 hai!\n`
+13. ret 0
+14. goto  26 
+15. out `\nfibonacci series: `
+16. i = 1
+17. t2=i-1
+18. if t2 >= n goto 26 
 19. out x
 20. out ` `
 21. x = y
 22. y = z
-23. t2=i+1
-24. i = t2
+23. t3=i+1
+24. i = t3
 25. goto 17
 26. ret 0
 27. out `Enter the number`
 28. in num
 29. param arg1
 30. param arg2
-31. call calculateFib 2,t3
-32. result = t3
+31. call calculateFib 2,t4
+32. result = t4
 33. ret 0

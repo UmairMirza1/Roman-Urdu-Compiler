@@ -6,9 +6,11 @@
 struct mapElement
 {
     string id;
+    
     std::string type;
     int address;
     string initVal = "-";
+    string typeG = "var";
 };
 
 class parser
