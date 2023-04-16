@@ -15,34 +15,45 @@ namespace constants
 // TODO : Seperate this to another file for better readability
 // Generic template function for writing to a file
 template <typename T>
-void writeToFile(const std::vector<T>& data, const std::string& filename);
+void writeToFile(const std::vector<T> &data, const std::string &filename);
 
-// Template specialization for mapElement
+// Template specialization for mapElement -- This is for symbol table
 template <>
-void writeToFile<mapElement>(const std::vector<mapElement>& data, const std::string& filename) {
+void writeToFile<mapElement>(const std::vector<mapElement> &data, const std::string &filename)
+{
     std::ofstream outfile(filename);
 
-    if (outfile.is_open()) {
-        for (const auto& element : data) {
-            outfile << element.id << " " << element.type << " " << element.address << " " << element.initVal <<  std::endl;
+    if (outfile.is_open())
+    {    
+        outfile << "ID  "<< " " << "type  " << " " << "address " << " " << "initVal " << std::endl;
+        for (const auto &element : data)
+        {
+            outfile << element.id << " " << element.type << " " << element.address << " " << element.initVal << std::endl;
         }
         outfile.close();
-    } else {
+    }
+    else
+    {
         std::cerr << "Unable to open file " << filename << std::endl;
     }
 }
 
-// Template specialization for string
+// Template specialization for string  -- This is for TAC
 template <>
-void writeToFile<std::string>(const std::vector<std::string>& data, const std::string& filename) {
+void writeToFile<std::string>(const std::vector<std::string> &data, const std::string &filename)
+{
     std::ofstream outfile(filename);
 
-    if (outfile.is_open()) {
-        for (const auto& element : data) {
-            outfile << element ;
+    if (outfile.is_open())
+    {
+        for (const auto &element : data)
+        {
+            outfile << element;
         }
         outfile.close();
-    } else {
+    }
+    else
+    {
         std::cerr << "Unable to open file " << filename << std::endl;
     }
 }
@@ -57,14 +68,12 @@ void Backpatch(int ReferenceLine)
     Patch = Patch.substr(0, Patch.size() - 1) + " " + LinePatch + " \n";
     lines[ReferenceLine] = Patch;
 }
-string parser::newTemp()
+mapElement parser::newTemp()
 {
     string varName = "t" + to_string(Variable_Count);
     Variable_Count++;
     mapElement m = {varName, "INT", address};
-    address += 4;
-    symbolTable.push_back(m);
-    return varName;
+    return m;
 }
 
 string testreserved[] = {
@@ -313,12 +322,14 @@ void parser::Variable()
     PrintAndIncreaseIndent("Variable");
 
     expect(TokenType::rakho);
+    mapElement m;
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
         std::string varName = _lexer.peek(1).lexeme;
-        mapElement m = {varName, "INT", address};
-        address += 4;
-        symbolTable.push_back(m);
+
+        m = {varName, "INT", address};
+        // address += 4;
+        // symbolTable.push_back(m);
     }
     string id = _lexer.peek(1).lexeme;
     // cout << "id is " << id << endl;
@@ -326,11 +337,11 @@ void parser::Variable()
     VarType();
     DecreaseIndent();
 
-    R(id); // * { R.id = Id.lex }
+    R(m); // * { R.id = Id.lex }
     DecreaseIndent();
 }
 
-void parser::R(string id)
+void parser::R(mapElement m)
 {
     PrintAndIncreaseIndent("R");
     if (_lexer.peek(1).tokenType == TokenType::Assignment_OP)
@@ -341,12 +352,17 @@ void parser::R(string id)
         string Val_v = Val();
         // *     { emit(R.id+”=”+ Val.v);
         // *     R.v =SymbolTable.add(R.id, INT);  }
-        emitLine = id + " = " + Val_v;
+        emitLine = m.id + " = " + Val_v;
+        m.initVal = Val_v;
+        symbolTable.push_back(m);
+        address += 4;
         emit(constants::TAC, emitLine);
         DecreaseIndent();
     }
     else
     {
+        symbolTable.push_back(m);
+        address += 4;
         // symbol table mei add karna hai
 
         return;
@@ -424,12 +440,13 @@ string parser::chalao()
     matchAscii('(');
     int PLF_i = 0; // *  {   PLF.i=0;   }
     int PLF_v = PLF(PLF_i);
-    string var = parser::newTemp();
-    emitLine = "call " + ID + " " + to_string(PLF_v) + "," + var;
+    mapElement m = parser::newTemp();
+    emitLine = "call " + ID + " " + to_string(PLF_v) + "," + m.id;
+
     emit(constants::TAC, emitLine); // *{ PLF.i=0; }
     DecreaseIndent();
     matchAscii(')');
-    return var;
+    return m.id;
 }
 
 // Parameter list functions
@@ -639,7 +656,7 @@ void parser::MarkaziOrNot()
     }
     else if (_lexer.peek(1).tokenType == TokenType::markazi)
     {
-        cout<< "Markazi function" << endl;
+        cout << "Markazi function" << endl;
         expect(TokenType::markazi);
         mapElement m = {"Markazi", "FUNC", lineNumber};
         symbolTable.push_back(m);
@@ -908,18 +925,23 @@ string parser::P(string i)
     {
         matchAscii('+');
         string T_v = T();
-        string var = newTemp();
-        emit(constants::TAC, var + "=" + i + "+" + T_v);
-        string P1_s = P(var);
+        mapElement m = newTemp();
+        emit(constants::TAC, m.id + "=" + i + "+" + T_v);
+        string P1_s = P(m.id);
+        m.initVal = i + "+" + T_v;
+        symbolTable.push_back(m);
+
         return P1_s;
     }
     else if (_lexer.peek(1).lexeme[0] == '-')
     {
         matchAscii('-');
         string T_v = T();
-        string var = newTemp();
-        emit(constants::TAC, var + "=" + i + "-" + T_v);
-        string P1_s = P(var);
+        mapElement m = newTemp();
+        emit(constants::TAC, m.id + "=" + i + "-" + T_v);
+        string P1_s = P(m.id);
+        m.initVal = i + "+" + T_v;
+        symbolTable.push_back(m);
         return P1_s;
     }
 
@@ -945,27 +967,36 @@ string parser::Q(string i)
     {
         matchAscii('*');
         string F_v = F();
-        string var = newTemp();
-        emit(constants::TAC, var + "=" + i + "*" + F_v);
-        string Q1_s = Q(var);
+        mapElement m = newTemp();
+
+        emit(constants::TAC, m.id + "=" + i + "*" + F_v);
+
+        string Q1_s = Q(m.id);
+        m.initVal = i + "+" + F_v;
+        symbolTable.push_back(m);
         return Q1_s;
     }
     else if (_lexer.peek(1).lexeme[0] == '/')
     {
         matchAscii('/');
         string F_v = F();
-        string var = newTemp();
-        emit(constants::TAC, var + "=" + i + "/" + F_v);
-        string Q1_s = Q(var);
+        mapElement m = newTemp();
+        emit(constants::TAC, m.id + "=" + i + "/" + F_v);
+        string Q1_s = Q(m.id);
+        m.initVal = i + "+" + F_v;
+        symbolTable.push_back(m);
+
         return Q1_s;
     }
     else if (_lexer.peek(1).lexeme[0] == '%')
     {
         matchAscii('-');
         string F_v = F();
-        string var = newTemp();
-        emit(constants::TAC, var + "=" + i + "%" + F_v);
-        string Q1_s = Q(var);
+        mapElement m = newTemp();
+        emit(constants::TAC, m.id + "=" + i + "%" + F_v);
+        string Q1_s = Q(m.id);
+        m.initVal = i + "+" + F_v;
+        symbolTable.push_back(m);
         return Q1_s;
     }
 

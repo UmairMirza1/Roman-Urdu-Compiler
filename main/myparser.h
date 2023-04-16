@@ -56,7 +56,7 @@ public:
     string F();
     void L();
     void RO();
-    void R(string id);
+    void R(mapElement m);
     int PLF(int i);
     void FuncMain();
     string Q(string i);
@@ -69,6 +69,6 @@ public:
     void ShowSymbolTable();
     string P(string i);
     string chalao();
-    string newTemp();
+    mapElement newTemp();
 };
 #endif
