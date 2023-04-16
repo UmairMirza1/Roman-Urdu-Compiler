@@ -12,6 +12,7 @@ namespace constants
     const string SYMBOL_TABLE = "symbol_table.txt";
 }
 
+// TODO : Seperate this to another file for better readability
 // Generic template function for writing to a file
 template <typename T>
 void writeToFile(const std::vector<T>& data, const std::string& filename);
@@ -45,23 +46,9 @@ void writeToFile<std::string>(const std::vector<std::string>& data, const std::s
         std::cerr << "Unable to open file " << filename << std::endl;
     }
 }
-template<typename T>
-void WriteVectorToFile(std::vector<T> &vectors, std::string filename)
-{
-    std::ofstream file(filename);
-    if (file.is_open())
-    {
-        for (const auto &vector : vectors)
-        {
-            file << vector;
-        }
-        file.close();
-    }
-    else
-    {
-        std::cerr << "Unable to open file: " << filename << std::endl;
-    }
-}
+
+
+
 
 
 
