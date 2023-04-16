@@ -40,10 +40,8 @@ occur without a space
 Context Free Grammar is given in CFG.txt
 
 ### PHASE 3
-
-## Generating Three Address code 
-
-
+## Translation scheme
+Translation Scheme is given in Translation scheme.txt
 
 
 
