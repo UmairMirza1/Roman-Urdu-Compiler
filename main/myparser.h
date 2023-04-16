@@ -5,15 +5,10 @@
 
 struct mapElement
 {
+    string id;
     std::string type;
-    std::string address;
+    int address;
 };
-
-struct ExpressionResult {
-    std::string RetVar;
-    std::string Exp;
-};
-
 
 class parser
 {
@@ -21,7 +16,8 @@ class parser
 
 public:
     // id, type , address
-    std::unordered_map<std::string, std::string> symbolTable;
+   // std::unordered_map<std::string, mapElement> symbolTable;
+    std::vector<mapElement> symbolTable;
     bool flag = false;
     int indent = 0;
     int ln = 0;
@@ -45,7 +41,6 @@ public:
     void IF();
     void WHILE();
     string Condition();
-    ExpressionResult Exp();
     int WG();
     void WP();
     void Stmt();
@@ -73,5 +68,6 @@ public:
     void ShowSymbolTable();
     string P(string i);
     string chalao();
+    string newTemp();
 };
 #endif

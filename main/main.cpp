@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
 		parser _parser(argv[1]);
 		_parser.parse();
-		_parser.ShowSymbolTable();
+		//_parser.ShowSymbolTable();
 	}
 	else if (argc > 2)
 	{ // argument limit exceeds

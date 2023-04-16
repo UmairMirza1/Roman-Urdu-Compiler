@@ -2,12 +2,12 @@
 1. x = t0
 2. x = 0
 3. y = 0
-4. if Condition_v  goto 6 
+4. if n < 0 goto 6 
 5. goto 9 
 6. out `munfi number daal diya\n`
 7. ret 0
 8. goto 26 
-9. if Condition_v goto 11 
+9. if n < 0 goto 11 
 10. goto  14 
 11. out `yar 0 hai!\n`
 12. ret 0
@@ -15,7 +15,7 @@
 14. out `\nfibonacci series: `
 15. i = 1
 16. t1=i-1
-17. if Cond goto  19 
+17. if t1 >= n goto 19 
 18. goto  26 
 19. out x
 20. out ` `

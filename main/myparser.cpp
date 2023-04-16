@@ -6,14 +6,47 @@ int lineNumber = 0;
 string emitLine = "";
 vector<string> lines;
 
-
 namespace constants
 {
     const string TAC = "TAC.txt";
     const string SYMBOL_TABLE = "symbol_table.txt";
 }
 
-void WriteVectorToFile(std::vector<std::string> vectors, std::string filename)
+// Generic template function for writing to a file
+template <typename T>
+void writeToFile(const std::vector<T>& data, const std::string& filename);
+
+// Template specialization for mapElement
+template <>
+void writeToFile<mapElement>(const std::vector<mapElement>& data, const std::string& filename) {
+    std::ofstream outfile(filename);
+
+    if (outfile.is_open()) {
+        for (const auto& element : data) {
+            outfile << element.id << " " << element.type << " " << element.address << std::endl;
+        }
+        outfile.close();
+    } else {
+        std::cerr << "Unable to open file " << filename << std::endl;
+    }
+}
+
+// Template specialization for string
+template <>
+void writeToFile<std::string>(const std::vector<std::string>& data, const std::string& filename) {
+    std::ofstream outfile(filename);
+
+    if (outfile.is_open()) {
+        for (const auto& element : data) {
+            outfile << element ;
+        }
+        outfile.close();
+    } else {
+        std::cerr << "Unable to open file " << filename << std::endl;
+    }
+}
+template<typename T>
+void WriteVectorToFile(std::vector<T> &vectors, std::string filename)
 {
     std::ofstream file(filename);
     if (file.is_open())
@@ -30,6 +63,8 @@ void WriteVectorToFile(std::vector<std::string> vectors, std::string filename)
     }
 }
 
+
+
 void Backpatch(int ReferenceLine)
 
 {
@@ -40,11 +75,14 @@ void Backpatch(int ReferenceLine)
     Patch = Patch.substr(0, Patch.size() - 1) + " " + LinePatch + " \n";
     lines[ReferenceLine] = Patch;
 }
-string newTemp()
+string parser::newTemp()
 {
-    string var_name = "t" + to_string(Variable_Count);
+    string varName = "t" + to_string(Variable_Count);
     Variable_Count++;
-    return var_name;
+    mapElement m = {varName, "INT", address};
+    address += 4;
+    symbolTable.push_back(m);
+    return varName;
 }
 
 string testreserved[] = {
@@ -198,7 +236,7 @@ void parser::Program()
     }
     else
     {
-        //cout << "here";
+        // cout << "here";
         return;
     }
 }
@@ -296,7 +334,9 @@ void parser::Variable()
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
         std::string varName = _lexer.peek(1).lexeme;
-        this->symbolTable[varName] = "ADAD";
+        mapElement m = {varName, "INT", address};
+        address += 4;
+        symbolTable.push_back(m);
     }
     string id = _lexer.peek(1).lexeme;
     // cout << "id is " << id << endl;
@@ -402,7 +442,7 @@ string parser::chalao()
     matchAscii('(');
     int PLF_i = 0; // *  {   PLF.i=0;   }
     int PLF_v = PLF(PLF_i);
-    string var = newTemp();
+    string var = parser::newTemp();
     emitLine = "call " + ID + " " + to_string(PLF_v) + "," + var;
     emit(constants::TAC, emitLine); // *{ PLF.i=0; }
     DecreaseIndent();
@@ -462,8 +502,16 @@ void parser::ShowSymbolTable()
 {
 
     cout << "-----Symbol table ----- \n";
-    for (auto x : this->symbolTable)
-        cout << x.first << " " << x.second << endl;
+    // cout << "ID"
+    //      << " "
+    //      << "TYPE"
+    //      << " "
+    //      << "ADDRESS";
+    // for (auto x : this->symbolTable)
+    // {
+    //     cout << x.id << " " << x.type << " " << x.address << endl;
+    // }
+    return;
 }
 
 void parser::Return()
@@ -484,7 +532,7 @@ void parser::IF()
     expect(TokenType::agar);
     matchAscii('(');
     // string Condition_v = Condition();
-    Condition();
+    string cond = Condition();
     DecreaseIndent();
     matchAscii(')');
     expect(TokenType::to);
@@ -492,7 +540,7 @@ void parser::IF()
     expect(TokenType::karo);
 
     int lnTrue = lineNumber;
-    emit(constants::TAC, "if Condition_v  goto");
+    emit(constants::TAC, "if " + cond + " goto");
     int lnFalse = lineNumber;
     emit(constants::TAC, "goto");
     Backpatch(lnTrue);
@@ -524,14 +572,14 @@ int parser::WG()
         expect(TokenType::warna);
         expect(TokenType::agar);
         matchAscii('(');
-        Condition();
+        string cond = Condition();
         DecreaseIndent();
         matchAscii(')');
         expect(TokenType::to);
         expect(TokenType::phir);
         Koment();
         int lnTrue = lineNumber;
-        emit(constants::TAC, "if Condition_v goto");
+        emit(constants::TAC, "if " + cond + " goto");
         int lnFalse = lineNumber;
         emit(constants::TAC, "goto ");
         Backpatch(lnTrue);
@@ -574,7 +622,7 @@ void parser::WHILE()
     expect(TokenType::jab);
     expect(TokenType::tak);
     matchAscii('(');
-    Condition();
+    string cond = Condition();
 
     DecreaseIndent();
     matchAscii(')');
@@ -583,7 +631,7 @@ void parser::WHILE()
     DecreaseIndent();
 
     int lnTrue = lineNumber;
-    emit(constants::TAC, "if Cond goto ");
+    emit(constants::TAC, "if " + cond + " goto");
     int lnFalse = lineNumber;
     emit(constants::TAC, "goto ");
     Backpatch(lnTrue);
@@ -601,14 +649,18 @@ void parser::MarkaziOrNot()
 {
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
+        cout << "Normal function" << endl;
         std::string FuncName = _lexer.peek(1).lexeme;
-        this->symbolTable[FuncName] = "FUNC";
+        mapElement m = {FuncName, "FUNC", lineNumber};
+        symbolTable.push_back(m);
         expect(TokenType::ID);
     }
     else if (_lexer.peek(1).tokenType == TokenType::markazi)
     {
+        cout<< "Markazi function" << endl;
         expect(TokenType::markazi);
-        this->symbolTable["MARKAZI"] = "FUNC";
+        mapElement m = {"Markazi", "FUNC", lineNumber};
+        symbolTable.push_back(m);
     }
     else
     {
@@ -811,12 +863,14 @@ string parser::Outval()
 string parser::Condition()
 {
     PrintAndIncreaseIndent("Condition()");
-    Expression();
+    string val1 = Expression();
     DecreaseIndent();
+    string RO_ = _lexer.peek(1).lexeme;
     RO();
     DecreaseIndent();
-    Expression();
+    string val2 = Expression();
     DecreaseIndent();
+    return val1 + " " + RO_ + " " + val2;
 }
 
 void parser::RO()
@@ -943,8 +997,8 @@ string parser::F()
 {
     PrintAndIncreaseIndent("F()");
     if (_lexer.peek(1).tokenType == TokenType::ID)
-    { 
-        cout<< "here \n";
+    {
+        cout << "here \n";
         string F_v = _lexer.peek(1).lexeme;
         expect(TokenType::ID);
         return F_v;
@@ -987,5 +1041,6 @@ void parser::parse()
     {
         std::cout << str << " ";
     }
-    WriteVectorToFile(lines, constants::TAC);
+    writeToFile(lines, constants::TAC);
+    writeToFile(symbolTable, constants::SYMBOL_TABLE);
 }

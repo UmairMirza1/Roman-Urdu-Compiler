@@ -1,0 +1,16 @@
+calculateFib FUNC 0
+x INT 0
+t0 INT 4
+x INT 8
+y INT 12
+z INT 16
+i INT 20
+t1 INT 24
+x INT 28
+y INT 32
+i INT 36
+t2 INT 40
+Markazi FUNC 27
+num INT 44
+result INT 48
+t3 INT 52
