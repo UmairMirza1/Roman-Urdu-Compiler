@@ -1,5 +1,5 @@
-ID   type   address  initVal 
-calculateFib FUNC 0 -
+ID   Datatype   address  initVal 
+calculateFib adad 0 -
 t0 INT 0 y+z
 x INT 0 t0
 x INT 4 0
@@ -11,6 +11,6 @@ x INT 20 y
 y INT 24 z
 t2 INT 28 i+1
 i INT 28 t2
-Markazi FUNC 27 -
+Markazi khali 27 -
 num INT 32 -
 result INT 36 t3

@@ -25,7 +25,7 @@ void writeToFile<mapElement>(const std::vector<mapElement> &data, const std::str
 
     if (outfile.is_open())
     {    
-        outfile << "ID  "<< " " << "type  " << " " << "address " << " " << "initVal " << std::endl;
+        outfile << "ID  "<< " " << "Datatype  " << " " << "address " << " " << "initVal " << std::endl;
         for (const auto &element : data)
         {
             outfile << element.id << " " << element.type << " " << element.address << " " << element.initVal << std::endl;
@@ -644,22 +644,23 @@ void parser::WHILE()
     DecreaseIndent();
 }
 
-void parser::MarkaziOrNot()
+string parser::MarkaziOrNot()
 {
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
         cout << "Normal function" << endl;
-        std::string FuncName = _lexer.peek(1).lexeme;
-        mapElement m = {FuncName, "FUNC", lineNumber};
-        symbolTable.push_back(m);
+        string id = _lexer.peek(1).lexeme;
         expect(TokenType::ID);
+        return id;
+        
     }
     else if (_lexer.peek(1).tokenType == TokenType::markazi)
     {
         cout << "Markazi function" << endl;
         expect(TokenType::markazi);
-        mapElement m = {"Markazi", "FUNC", lineNumber};
-        symbolTable.push_back(m);
+        // mapElement m = {"Markazi", "FUNC", lineNumber};
+        // symbolTable.push_back(m);
+        return "Markazi";
     }
     else
     {
@@ -671,9 +672,11 @@ void parser::Function()
 {
     PrintAndIncreaseIndent("Function()");
     expect(TokenType::kaam);
-    MarkaziOrNot();
+    // ID , functype , lineNumber , 
+
+    string ID = MarkaziOrNot();
     matchAscii('@');
-    FuncT();
+    FuncT(ID);
     DecreaseIndent();
     matchAscii('(');
     ParameterList();
@@ -738,18 +741,24 @@ void parser::MPL()
     }
 }
 
-void parser::FuncT()
+void parser::FuncT(string ID)
 {
     // cout << _lexer.peek(1).lexeme << endl;
     PrintAndIncreaseIndent("FuncT()");
     if (_lexer.peek(1).tokenType == TokenType::khali)
-    {
+    {   
+    
+        mapElement m = {ID, "khali", lineNumber};
+        symbolTable.push_back(m);
         expect(TokenType::khali);
 
         return;
     }
     else if (_lexer.peek(1).tokenType == TokenType::adad)
     {
+        
+        mapElement m = {ID, "adad", lineNumber};
+        symbolTable.push_back(m);
         expect(TokenType::adad);
         return;
     }

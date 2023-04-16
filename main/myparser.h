@@ -34,7 +34,7 @@ public:
     void parse();
     void Code();
     void matchAscii(int ascii);
-    void FuncT();
+    void FuncT(string ID);
     void ParameterList();
     void MPL();
     void Koment();
@@ -65,7 +65,7 @@ public:
     void PrintAndIncreaseIndent(string s);
     int MPLF(int i);
     void VarType();
-    void MarkaziOrNot();
+    string MarkaziOrNot();
     void ShowSymbolTable();
     string P(string i);
     string chalao();
