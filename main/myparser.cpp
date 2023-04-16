@@ -24,7 +24,7 @@ void writeToFile<mapElement>(const std::vector<mapElement>& data, const std::str
 
     if (outfile.is_open()) {
         for (const auto& element : data) {
-            outfile << element.id << " " << element.type << " " << element.address << std::endl;
+            outfile << element.id << " " << element.type << " " << element.address << " " << element.initVal <<  std::endl;
         }
         outfile.close();
     } else {
@@ -46,11 +46,6 @@ void writeToFile<std::string>(const std::vector<std::string>& data, const std::s
         std::cerr << "Unable to open file " << filename << std::endl;
     }
 }
-
-
-
-
-
 
 void Backpatch(int ReferenceLine)
 

@@ -8,6 +8,7 @@ struct mapElement
     string id;
     std::string type;
     int address;
+    string initVal = "-";
 };
 
 class parser
