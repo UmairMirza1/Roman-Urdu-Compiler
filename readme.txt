@@ -41,7 +41,8 @@ When we were making the DFA transition to '=' after x , the equal was getting ig
 4. Whenever an ID is returned , there is function that checks if the currentLexeme
 matches any of our language constructs. If it doesn't, it returns the tokenType ID.
 
+Fixed a lot of stuff and now everything seems to be working
 
-shit to doesn
-.. markazi
 .. 
+
+Changed expression to be left a associative
