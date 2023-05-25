@@ -1,12 +1,8 @@
-rakho x@adad:=a;
-rakho y@adad := 0; mariam
-rakho f@adad ;
-rakho y@adad := chalao func(var);
-rakho x@adad := chalao func(var|0);
-lo << `Enter the number` >> num; input
-dekhao << `munfi number daal diya\n` << 'po';
-
-
-
-
-
+kaam markazi@khali () karo
+dekhao << `How to boost your mental health `; 
+rakho i@adad := 1;
+rakho n := 10;
+dekhao << n;
+rakho y := n * 4;
+dekhao << y;
+kaam khatam

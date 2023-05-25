@@ -64,6 +64,7 @@ public:
     string Q(string i);
     void Cascading();
     void DecreaseIndent();
+    void addToSymbolTable(mapElement m);
     void PrintAndIncreaseIndent(string s);
     int MPLF(int i);
     void VarType();
@@ -72,5 +73,6 @@ public:
     string P(string i);
     string chalao();
     mapElement newTemp();
+    string GetAddress(string id);
 };
 #endif

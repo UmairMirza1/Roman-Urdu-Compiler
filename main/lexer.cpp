@@ -153,7 +153,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             else if ((*it) == '`')
             {
                 state = 3;
-                currentLexeme.push_back(*it);
+                //currentLexeme.push_back(*it);
             }
             // Transition to comment
             else if ((*it) == ';')
@@ -276,7 +276,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
 
             if ((*it) == '`')
             { //  TODO: check for double back tick
-                currentLexeme.push_back(*it);
+                //currentLexeme.push_back(*it);
                 tokens.push_back(token(string(currentLexeme), TokenType::string));
                 state = 0;
                 currentLexeme = "";

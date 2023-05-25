@@ -1,5 +1,4 @@
 kaam calculateFib@adad (n@adad | c@adad) karo  
- 	rakho x := y+z;
  	rakho x@adad:=0;
 	rakho y@adad := 0; mariam
 	rakho z@adad ;
@@ -15,7 +14,8 @@ kaam calculateFib@adad (n@adad | c@adad) karo
 		dekhao << `\nfibonacci series: `; 
 		rakho i@adad := 1;
 		jab tak (i-1 >= n) karo
-			dekhao << x << ` `;			
+			dekhao << x << ` `;	
+			rakho z := x+y ;		
 			rakho x := y;
 			rakho y := z;
 			rakho i := i + 1;

@@ -75,6 +75,7 @@ void Backpatch(int ReferenceLine)
     Patch = Patch.substr(0, Patch.size() - 1) + " " + LinePatch + " \n";
     lines[ReferenceLine - 1] = Patch;
 }
+
 mapElement parser::newTemp()
 {
     string varName = "t" + to_string(Variable_Count);
@@ -129,8 +130,8 @@ void emit(const string filename, const string &text)
     // file << lineNumber << ". " <<  text << "\n";
 
     // I have done this to optimize the backPatch
+    string string_to_emit = text + "\n";
 
-    string string_to_emit = to_string(lineNumber) + ". " + text + "\n";
     lines.push_back(string_to_emit);
     lineNumber++;
 }
@@ -164,6 +165,21 @@ parser::parser(const char filename[])
     // Deleting the TAC file if it exists so that it can be created again
     remove(constants::TAC.c_str());
     remove(constants::SYMBOL_TABLE.c_str());
+}
+
+void parser::addToSymbolTable(mapElement m)
+{
+    for (auto x : this->symbolTable)
+    {
+        if (x.id == m.id)
+        {
+            return;
+        }
+    }
+    symbolTable.push_back(m);
+    if (m.typeG == "func")
+        return;
+    address += 4;
 }
 
 void parser::readAndPrintAllInput() // read and print allinputs (provided)
@@ -348,36 +364,60 @@ void parser::Variable()
     DecreaseIndent();
 }
 
+string parser::GetAddress(string id)
+{
+
+    // std::cout << "id is " << id << "\n";
+
+    for (const auto &element : this->symbolTable)
+    {
+        if (element.id == id)
+        {
+            return std::to_string(element.address);
+        }
+    }
+    
+    {
+        throw std::invalid_argument(" ' " + id  + " ' " + " ye tera baap declare krega ?" );
+    }
+}
+
 void parser::R(mapElement m)
 {
     PrintAndIncreaseIndent("R");
     if (_lexer.peek(1).tokenType == TokenType::Assignment_OP)
     {
-        // if we give this a token type
+
         expect(TokenType::Assignment_OP);
 
         string Val_v = Val();
         // *     { emit(R.id+”=”+ Val.v);
         // *     R.v =SymbolTable.add(R.id, INT);  }
-        emitLine = m.id + " = " + Val_v;
+        // emitLine = m.id + " = " + Val_v;
+
+        string opcode = "Assign";
+
         if (isdigit(Val_v[0]))
         {
             m.initVal = Val_v;
         }
         else
         {
-            m.initVal = Val_v;
+            m.initVal = "0";
         };
 
         m.address = address;
-        symbolTable.push_back(m);
-        address += 4;
+        addToSymbolTable(m);
+
+        emitLine = opcode + " " + GetAddress(Val_v) + " " + GetAddress(m.id);
+        // emitLine = "rip";
         emit(constants::TAC, emitLine);
         DecreaseIndent();
     }
     else
     {
         m.address = address;
+        m.initVal = "0";
         symbolTable.push_back(m);
         address += 4;
         // symbol table mei add karna hai
@@ -399,8 +439,11 @@ string parser::Val()
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
         string Val_v = _lexer.peek(1).lexeme; // * { Val.v = Digit.v }
-        expect(TokenType::Digit);
-        return Val_v;
+        mapElement m = newTemp();
+        m.initVal = Val_v;
+        addToSymbolTable(m);
+        expect(TokenType::Digit); // yayyyyyy wpooooooo
+        return m.id;
     }
     else if (_lexer.peek(1).tokenType == TokenType::chalao)
     {
@@ -459,9 +502,11 @@ string parser::chalao()
     int PLF_v = PLF(PLF_i);
     mapElement m = parser::newTemp();
 
-    emitLine = "call " + ID + " " + to_string(PLF_v) + "," + m.id;
+    // TODO : THINGS TO DO AFTER SEMESTER
 
-    emit(constants::TAC, emitLine); // *{ PLF.i=0; }
+    // emitLine = "call " + ID + " " + to_string(PLF_v) + "," + m.id;
+    addToSymbolTable(m);
+    // emit(constants::TAC, emitLine); // *{ PLF.i=0; }
     DecreaseIndent();
     matchAscii(')');
     return m.id;
@@ -473,9 +518,11 @@ int parser::PLF(int i)
     PrintAndIncreaseIndent("PLF()");
     if (_lexer.peek(1).tokenType == TokenType::ID)
     {
+        // TODO : THINGS TO DO AFTER SEMESTER
         string id = _lexer.peek(1).lexeme;
         expect(TokenType::ID);
-        emit(constants::TAC, "param " + id);
+
+        // emit(constants::TAC, "param " + id);
         int PLF_i = i + 1;
         int Plf_v = MPLF(PLF_i);
         DecreaseIndent();
@@ -485,7 +532,7 @@ int parser::PLF(int i)
     {
         string id = _lexer.peek(1).lexeme;
         expect(TokenType::Digit);
-        emit(constants::TAC, "param " + id);
+        // emit(constants::TAC, "param " + id);
         int PLF_i = i + 1;
         int Plf_v = MPLF(PLF_i);
         DecreaseIndent();
@@ -538,9 +585,11 @@ void parser::Return()
     expect(TokenType::bhaijo);
     string ID = _lexer.peek(1).lexeme;
     expect(TokenType::Digit);
-    emit(constants::TAC, "ret " + ID);
-    // expect(TokenType::koment);
-    // cout << "wapis jarhga hu n bhai jo" << endl;
+
+    emit(constants::TAC, "ret");
+    // emit(constants::TAC, "ret " + ID);
+    //  expect(TokenType::koment);
+    //  cout << "wapis jarhga hu n bhai jo" << endl;
 }
 
 void parser::IF()
@@ -557,7 +606,12 @@ void parser::IF()
     expect(TokenType::karo);
 
     int lnTrue = lineNumber;
-    emit(constants::TAC, "if " + cond + " goto");
+
+    emitLine = cond;
+
+    // emit(constants::TAC, "if " + cond + " goto");
+
+    emit(constants::TAC, emitLine);
     int lnFalse = lineNumber;
     emit(constants::TAC, "goto");
     Backpatch(lnTrue);
@@ -596,7 +650,9 @@ int parser::WG()
         expect(TokenType::phir);
         Koment();
         int lnTrue = lineNumber;
-        emit(constants::TAC, "if " + cond + " goto");
+        emitLine = cond;
+        // emit(constants::TAC, "if " + cond + " goto");
+        emit(constants::TAC, emitLine);
         int lnFalse = lineNumber;
         emit(constants::TAC, "goto ");
         Backpatch(lnTrue);
@@ -647,7 +703,9 @@ void parser::WHILE()
     expect(TokenType::karo);
     Koment();
     DecreaseIndent();
-    emit(constants::TAC, "if " + cond + " goto");
+    // emit(constants::TAC, "if " + cond + " goto");
+    emit(constants::TAC, cond);
+
     Code();
     emit(constants::TAC, "goto " + to_string(eval));
     Backpatch(lnTrue);
@@ -703,6 +761,7 @@ void parser::Function()
     DecreaseIndent();
     expect(TokenType::kaam);
     expect(TokenType::khatam);
+    emit(constants::TAC, "end");
     Koment();
     DecreaseIndent();
 }
@@ -729,9 +788,10 @@ void parser::ParameterList()
     {
 
         string Id = _lexer.peek(1).lexeme;
-        mapElement m = {Id, "adad", address, "0"};
-        symbolTable.push_back(m);
-        address += 4;
+        mapElement m = {Id, "INT", address, "0"};
+        addToSymbolTable(m);
+        // symbolTable.push_back(m);
+        // address += 4;
         expect(TokenType::ID);
         matchAscii('@');
         expect(TokenType::adad);
@@ -762,13 +822,15 @@ void parser::MPL()
 void parser::FuncT(string ID)
 {
     // cout << _lexer.peek(1).lexeme << endl;
+
     PrintAndIncreaseIndent("FuncT()");
     if (_lexer.peek(1).tokenType == TokenType::khali)
     {
 
-        mapElement m = {ID, "khali", lineNumber};
-        m.typeG= "func";
-        symbolTable.push_back(m);
+        mapElement m = {ID, "void", lineNumber};
+        m.typeG = "func";
+        addToSymbolTable(m);
+        // symbolTable.push_back(m);
         expect(TokenType::khali);
 
         return;
@@ -776,9 +838,10 @@ void parser::FuncT(string ID)
     else if (_lexer.peek(1).tokenType == TokenType::adad)
     {
 
-        mapElement m = {ID, "adad", lineNumber};
-        m.typeG= "func";
-        symbolTable.push_back(m);
+        mapElement m = {ID, "INT", lineNumber};
+        m.typeG = "func";
+        // symbolTable.push_back(m);
+        addToSymbolTable(m);
         expect(TokenType::adad);
         return;
     }
@@ -798,7 +861,7 @@ void parser::Input()
     expect(TokenType::Input);
     string inputID = _lexer.peek(1).lexeme;
     expect(TokenType::ID);
-    string EmitLine = "in " + inputID;
+    string EmitLine = "in " + GetAddress(inputID);
     emit(constants::TAC, EmitLine);
 }
 
@@ -811,7 +874,7 @@ void parser::InputMsg()
         string inputstr = _lexer.peek(1).lexeme;
         expect(TokenType::string);
         //{ emit (“out” +String .v +”\n”) }
-        string EmitLine = "out " + inputstr;
+        string EmitLine = "outS " + inputstr;
         emit(constants::TAC, EmitLine);
     }
     else
@@ -830,7 +893,9 @@ void parser::Output()
         expect(TokenType::Output);
         string outval = Outval();
         // { emit (“out” + OutVal.v +”\n” ) }
-        string EmitLine = "out " + outval;
+
+        string EmitLine = outval;
+
         emit(constants::TAC, EmitLine);
         DecreaseIndent();
         Cascading();
@@ -849,7 +914,8 @@ void parser::Cascading()
         expect(TokenType::Output);
         string outval = Outval();
         // { emit (“out” + OutVal.v +”\n” ) }
-        string EmitLine = "out " + outval;
+        // string EmitLine = "out " + outval;
+        string EmitLine = outval;
         emit(constants::TAC, EmitLine);
         DecreaseIndent();
         Cascading();
@@ -865,21 +931,25 @@ string parser::Outval()
 {
     PrintAndIncreaseIndent("Outval");
     if (_lexer.peek(1).tokenType == TokenType::string)
-    {
+    { // cout << "here detected A STRING";
         string outstr = _lexer.peek(1).lexeme;
         expect(TokenType::string);
+
+        outstr = "outS " + outstr;
         return outstr;
     }
     else if (_lexer.peek(1).tokenType == TokenType::ID)
     {
         string outid = _lexer.peek(1).lexeme;
         expect(TokenType::ID);
+        outid = "outV " + GetAddress(outid);
         return outid;
     }
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
         string outdigit = _lexer.peek(1).lexeme;
         expect(TokenType::Digit);
+        outdigit = "outS " + outdigit;
         return outdigit;
     }
     else
@@ -898,7 +968,9 @@ string parser::Condition()
     DecreaseIndent();
     string val2 = Expression();
     DecreaseIndent();
-    return val1 + " " + RO_ + " " + val2;
+
+    // return val1 + " " + RO_ + " " + val2;
+    return RO_ + " " + GetAddress(val1) + " " + GetAddress(val2);
 }
 
 void parser::RO()
@@ -955,11 +1027,14 @@ string parser::P(string i)
         matchAscii('+');
         string T_v = T();
         mapElement m = newTemp();
-        emit(constants::TAC, m.id + "=" + i + "+" + T_v);
-        string P1_s = P(m.id);
+
         m.initVal = "0";
-        symbolTable.push_back(m);
-        address += 4;
+        addToSymbolTable(m);
+
+        emitLine = "+ " + GetAddress(i) + " " + GetAddress(T_v) + " " + GetAddress(m.id);
+        // emit(constants::TAC, m.id + "=" + i + "+" + T_v);
+        emit(constants::TAC, emitLine);
+        string P1_s = P(m.id);
         return P1_s;
     }
     else if (_lexer.peek(1).lexeme[0] == '-')
@@ -967,11 +1042,14 @@ string parser::P(string i)
         matchAscii('-');
         string T_v = T();
         mapElement m = newTemp();
-        emit(constants::TAC, m.id + "=" + i + "-" + T_v);
-        string P1_s = P(m.id);
+        // emit(constants::TAC, m.id + "=" + i + "-" + T_v);
+
         m.initVal = "0";
-        symbolTable.push_back(m);
-        address += 4;
+        addToSymbolTable(m);
+
+        emitLine = "- " + GetAddress(i) + " " + GetAddress(T_v) + " " + GetAddress(m.id);
+        emit(constants::TAC, emitLine);
+        string P1_s = P(m.id);
         return P1_s;
     }
 
@@ -998,13 +1076,13 @@ string parser::Q(string i)
         matchAscii('*');
         string F_v = F();
         mapElement m = newTemp();
-
-        emit(constants::TAC, m.id + "=" + i + "*" + F_v);
+        m.initVal = "0";
+        addToSymbolTable(m);
+        emitLine = "* " + GetAddress(i) + " " + GetAddress(F_v) + " " + GetAddress(m.id);
+        emit(constants::TAC, emitLine);
+        // emit(constants::TAC, m.id + "=" + i + "*" + F_v);
 
         string Q1_s = Q(m.id);
-        m.initVal = "0";
-        symbolTable.push_back(m);
-        address += 4;
         return Q1_s;
     }
     else if (_lexer.peek(1).lexeme[0] == '/')
@@ -1012,11 +1090,12 @@ string parser::Q(string i)
         matchAscii('/');
         string F_v = F();
         mapElement m = newTemp();
-        emit(constants::TAC, m.id + "=" + i + "/" + F_v);
-        string Q1_s = Q(m.id);
         m.initVal = "0";
-        symbolTable.push_back(m);
-        address += 4;
+        addToSymbolTable(m);
+        emitLine = "/ " + GetAddress(i) + " " + GetAddress(F_v) + " " + GetAddress(m.id);
+        emit(constants::TAC, emitLine);
+        // emit(constants::TAC, m.id + "=" + i + "/" + F_v);
+        string Q1_s = Q(m.id);
         return Q1_s;
     }
     else if (_lexer.peek(1).lexeme[0] == '%')
@@ -1024,11 +1103,14 @@ string parser::Q(string i)
         matchAscii('-');
         string F_v = F();
         mapElement m = newTemp();
-        emit(constants::TAC, m.id + "=" + i + "%" + F_v);
-        string Q1_s = Q(m.id);
+        emitLine = "% " + GetAddress(i) + " " + GetAddress(F_v) + " " + GetAddress(m.id);
+        emit(constants::TAC, emitLine);
+
+        // emit(constants::TAC, m.id + "=" + i + "%" + F_v);
+
         m.initVal = "0";
-        symbolTable.push_back(m);
-        address += 4;
+        addToSymbolTable(m);
+        string Q1_s = Q(m.id);
         return Q1_s;
     }
 
@@ -1051,8 +1133,13 @@ string parser::F()
     else if (_lexer.peek(1).tokenType == TokenType::Digit)
     {
         string F_v = _lexer.peek(1).lexeme;
-        expect(TokenType::Digit);
-        return F_v;
+        // expect(TokenType::Digit);
+        mapElement m = newTemp();
+        m.initVal = F_v;
+        addToSymbolTable(m);
+        expect(TokenType::Digit); // yayyyyyy wpooooooo
+
+        return m.id;
     }
     else if (_lexer.peek(1).lexeme[0] == '(')
     {

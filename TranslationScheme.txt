@@ -7,13 +7,14 @@ D → Code | Function | Koment
 
 Code → Statement Code | If Code | While Code | ^
 
-Statement → Stmt Comment
+Statement → Stmt koment
 Stmt → Variable | Input | Output | Return | Chalao
 
-Function →  kaam ID @ FuncT ( PL ) karo Koment Code kaam khatam Koment
-FuncT -> khali | adad 
-PL → ID @ adad MPL  | ^
+Function →  kaam ID  { Funct.id = Id.lex} @ FuncT ( PL ) karo Koment Code kaam khatam Koment
+FuncT -> khali | adad  { symbolTbl.add(ID.lex,Funct.id, lineNumber}
+PL → ID {symbolTable.add(ID,var)} @ adad MPL  | ^
 MPL → | PL   | ^
+
 
 ==============Rakho=========================
 Variable → rakho ID Type { R.id = Id.lex } R 
@@ -22,70 +23,108 @@ R → := Val {
 emit(R.id+”=”+ Val.v); 
 R.v =SymbolTable.add(R.id, INT);  }
 |  ^ {  R.v = SymbolTable.add(R.id, INT);  }
-w
+
+
 Val → ID { Val.v=ID.lex; }
  | Integer { Val.v=Integer.lex; }
- | Exp { Val.v=Exp.v; } 
+ | Exp      { Val.v=Exp.v; } 
 | Chalao {Val.v=Chalao.v}
 
-========================================
+=================Condition=======================
 
-Condition → Exp RO  Exp  { Condition.Value =  Exp.ex + Ro.lex + Exp.ex } 
-
-========================================     
+Condition → Exp RO  Exp  { Condition.V =  Exp.ex + Ro.lex + Exp.ex } 
 
 
 
 
-Exp → T - Exp1 {
-var=newTemp();
-SymbolTable.add(var, INT);
-emit(var+’=’+T.val+’-’+Exp1.val);
-Exp.val=var   
-Exp.ex = T.val + “-” + exp1.ex 
+
+
+==================Expression=====================    
+
+// P, S are the recursive vars
+E → T  P
+P  → + T  P1 | - T P1  | ^ 
+T →  F S
+S→ % F S | / F S | * F S | ^
+F → ID | Digit
+—---------------------------------------------------------
+Actions 
+NOTE:   New temp function will automatically add that variable in symbol table
+
+E →    T    { P.i = T.v }   P	{ E.v = P.s ; }
+
+
+P →    + 
+T 	{
+var =newTemp();
+emit( var + “=” + P.i + “+” + T.val);
+P1.i = var; 
+	P1	{ P.s = P1.s  }
+
+
+P →     - 
+	T 	{
+var =newTemp();
+emit(var + “=” + P.i + “-” + T.val);
+P1.i = var 
+}
+P1	{P.s = P1.s}
+
+
+
+
+P →    ^	{P.s = P.i i}   
+
+T →     F 	{Q.i = F.v}
+	 Q	{T.v = Q.s}
+
+
+
+
+
+Q →    * 
+	F 	{
+var =newTemp();
+emit(var + “=” + Q.i + “*” + F.val};
+Q1.i = var 
+}
+	Q1	{Q.s = Q1.s}
+
+
+Q →     /
+	 F 	{
+var =newTemp();
+emit(var + “=” + Q.i + “/” + F.val};
+Q1.i = var 
+
 }
 
-                          
-Exp → T + Exp2{
-var=newTemp();
-SymbolTable.add(var, INT);
-emit(var+’=’+T.val+’+’+Exp2.val);
-Exp.val=var; 
-Exp.ex = T.val + “-” + exp1.ex 
+	Q1	{Q.s = Q1.s}
+
+Q →   %
+	F 	{
+var =newTemp();
+emit(var + “=” + Q.i + “%” + F.val};
+Q1.i = var 
+
 }
 
-Exp → T {Exp.val=T.val;}
-    
-T →  L% T1 {
-var=newTemp();
-SymbolTable.add(var, INT);
-emit(var+’=’+L.val+’%’+T1.val);
-T.val=var;
-T.ex=L.val+”%”+T1.ex;
-}
-                    
-T →  L /  T2 {
-var=newTemp();
-SymbolTable.add(var, INT);
-emit(var+’=’+L.val+’/’+T2.val);
-T.val=var;
-T.ex=L.val+”/”+T2.ex;
-}
-                    
-                    
-T →  L*  T3 {
-var=newTemp();
-SymbolTable.add(var, INT);
-emit(var+’=’+L.val+’*’+T3.val);
-T.val=var;
-T.ex=L.val+”*”+T3.ex;
- }
-  
-T →  L  {T.val=L.val; T.ex=L.val}
-L → ID  { L.val=ID.lex; }
-L → Integer   { L.val=Integer.lex; }
+	Q1	{Q.s = Q1.s}
 
-=======================================
+Q →   	^  	{Q.s = Q.i}
+
+F →  num   { F.v = num.lex }
+
+F →  ID       { F.v = id.lex }
+
+
+
+
+
+
+
+
+=================Function Call======================
 
 Chalao →  chalao ID { PLF.i=0; } ( PLF ) { 
 var=newTemp(); 
@@ -109,12 +148,12 @@ MPLF → | { PLF.i = MPLF.i ;} PLF  {MPLF.v = PLF.v;}
 MPLF → ^ { MPLF.v = MPLF.i ;} 
 
 
-========================================
+==================Comment======================
 
 Koment → Comment  | ^
 
-========================================
-
+=================Branching=======================
+Note:  Backpatch has global access to ln, so it patches current line number at the parameter passed to it 
 IF    →  agar ( Condition ) to phir karo { 
 lnTrue= n ;
 emit ( “if” + Condition.v + goto + __ ) ;
@@ -152,13 +191,13 @@ WG  →  ^
 WP  →  warna phir Koment  Code 
 WP  →   ^
 
-========================================
-
-
+===================Return=====================
 
 
 Return-> wapis bhaijo Val { emit (“ret” + Val.v) }
 
+
+===================Input=====================
 // Todo : Add cascading to it
 
 Input → lo   InputMsg  >> ID { emit(“in”+ID.v+”\n”) }   
@@ -166,24 +205,26 @@ InputMsg → ^
 InputMsg → << String  { emit (“out” +String .v +”\n”) }
 
 
+
+
+
+===================Output=====================
 Output →  dekhao <<  OutVal  { emit (“out” + OutVal.v +”\n” ) } MoreOut 
 MoreOut → << OutVal MoreOut { emit ( “out” + OutVal.v +”\n” )  }  
 MoreOut →^
 OutVal → String { String.lex } | Val { Val.v }
 
+===================Do Until=====================
 
-Note:  Backpatch has global access to ln, so it patches current line number at the parameter passed to it 
 
-While →  jab tak ( Condition )  karo Koment   
-{  
-lnTrue = n ;
-emit (“if” + Condition.Value goto __  ); 
-lnFalse = n;
-Emit (goto __ ) 
-BackPatch(lnTrue)} 
+While →  jab tak  { EvalLine=Ln} ( Condition )  karo Koment   
+{ 
+lnTrue =n;
+Emit ( if condition goto __ ) 
+} 
 Code  
-{ emit( “goto” + lnTrue) }
-bas karo { BackPatch(lnFalse) } 
+{ emit( “goto” + EvalLine) }
+bas karo { BackPatch(lnTrue) } 
 Koment
 
 
