@@ -1,11 +1,43 @@
-Assign 0 4
-= 4 8 4 
-goto 6 
+outS Enter the number
+in 0
+outV 0
+outS  
++ 0 4 8
+Assign 8 0
+outV 0
+outS \n
+- 0 12 16
+Assign 16 0
+outV 0
+outS \n
+* 0 20 24
+Assign 24 0
+outV 0
+outS \n
+/ 0 28 32
+Assign 32 0
+outV 0
+outS \n
+% 0 36 40
+Assign 40 0
+outV 0
+outS \n
+Assign 44 48
+= 48 52 32 
+outV 48
+outS  
++ 48 56 60
+Assign 60 48
+goto 26
+outS \n
+Assign 64 68
+= 68 72 36 
+goto 38 
 outS aik daal diya\n
-goto 11 
-= 4 12 8 
-goto  10 
+goto 43 
+= 68 76 40 
+goto  42 
 outS yar 0 hai!\n
-goto  11 
+goto  43 
 outS \nhan ab sahi hay: 
 end

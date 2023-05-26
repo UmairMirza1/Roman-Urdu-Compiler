@@ -4,9 +4,9 @@
 This readMe contains Phases that the parser has been implemented in.
 
 ## Steps to run 
-- cd into main to run the make file;
+- cd main;
 - make 
-- ./a.out
+- ./a.out <filename>
 
 ## Grammar 
 We start by defining Regular Definition 
@@ -45,9 +45,6 @@ Translation Scheme is given in Translation scheme.pdf
 
 ### PHASE 4
 ## Virtual Machine
-
-
-
 
 
 # Final product
