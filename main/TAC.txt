@@ -1,6 +1,11 @@
 Assign 0 4
- 4 8 4 
+= 4 8 4 
 goto 6 
-outS aik se kum  daal diya\n
-goto 6 
+outS aik daal diya\n
+goto 11 
+= 4 12 8 
+goto  10 
+outS yar 0 hai!\n
+goto  11 
+outS \nhan ab sahi hay: 
 end

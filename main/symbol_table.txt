@@ -3,3 +3,4 @@ Markazi func void 1 -
 t1 var INT 0 1
 n var INT 4 0
 t2 var INT 8 1
+t3 var INT 12 0

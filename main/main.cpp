@@ -153,7 +153,7 @@ int *loadDataSegment(std::vector<mapElement> symbolTable)
 	for (int i = 1; i < symbolTable.size(); i++)
 	{
 		dataSegment[i - 1] = stoi(symbolTable[i].initVal);
-		//cout << symbolTable[i].initVal << " " << endl;
+		// cout << symbolTable[i].initVal << " " << endl;
 	}
 
 	// print data segment
@@ -241,6 +241,13 @@ void VM(string filename, std::vector<mapElement> symbolTable)
 		case 603: // equalTo
 		{
 			tokens = tokenizeString(exec[i]);
+			int index1 = stoi(tokens[1]);
+			int index2 = stoi(tokens[2]);
+			int index3 = stoi(tokens[3]);
+			if (dataSegment[index1 / 4] == dataSegment[index2 / 4])
+			{
+				i = index3 - 2;
+			}
 
 			break;
 		}
