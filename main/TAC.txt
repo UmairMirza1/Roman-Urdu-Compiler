@@ -1,12 +1,6 @@
-outS `haha`
-+ 0 4 8
-Assign 8 12
-outV 12
-Assign 16 20
-in 20
-outS `ye hai y`
-outV 20
-< 20 24 11 
-goto 13 
-outS `munfi number daal diya\n`
-goto 13 
+Assign 0 4
+ 4 8 4 
+goto 6 
+outS aik se kum  daal diya\n
+goto 6 
+end

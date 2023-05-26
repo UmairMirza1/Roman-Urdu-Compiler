@@ -376,9 +376,9 @@ string parser::GetAddress(string id)
             return std::to_string(element.address);
         }
     }
-    
+
     {
-        throw std::invalid_argument(" ' " + id  + " ' " + " ye tera baap declare krega ?" );
+        throw std::invalid_argument(" ' " + id + " ' " + " not declared");
     }
 }
 
@@ -1100,16 +1100,17 @@ string parser::Q(string i)
     }
     else if (_lexer.peek(1).lexeme[0] == '%')
     {
-        matchAscii('-');
+        matchAscii('%');
         string F_v = F();
         mapElement m = newTemp();
+
+        m.initVal = "0";
+        addToSymbolTable(m);
         emitLine = "% " + GetAddress(i) + " " + GetAddress(F_v) + " " + GetAddress(m.id);
         emit(constants::TAC, emitLine);
 
         // emit(constants::TAC, m.id + "=" + i + "%" + F_v);
 
-        m.initVal = "0";
-        addToSymbolTable(m);
         string Q1_s = Q(m.id);
         return Q1_s;
     }

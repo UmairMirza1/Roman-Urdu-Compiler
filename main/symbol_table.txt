@@ -1,8 +1,5 @@
 ID  TYPE Datatype   address  initVal 
-t1 var INT 0 6
-t2 var INT 4 7
-t3 var INT 8 0
-x var INT 12 0
-t4 var INT 16 0
-y var INT 20 0
-t5 var INT 24 0
+Markazi func void 1 -
+t1 var INT 0 1
+n var INT 4 0
+t2 var INT 8 1

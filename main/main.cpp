@@ -198,7 +198,7 @@ void VM(string filename, std::vector<mapElement> symbolTable)
 	// load values in an int array from symbol table
 	auto dataSegment = loadDataSegment(symbolTable);
 
-	cout << "Starting execution" << std::endl;
+	cout << "-----Starting execution----" << std::endl;
 	int i = 0;
 	for (i; i < exec.size(); i++)
 	{
