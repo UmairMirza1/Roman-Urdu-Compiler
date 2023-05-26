@@ -3,10 +3,12 @@
 .ru is our file extension abbreviation of "Roman Urdu" for this Compiler
 This readMe contains Phases that the parser has been implemented in.
 
-## Steps to run 
-- cd main;
+## Steps to run
+```bash
+- cd main
 - make 
 - ./a.out <filename>
+```
 
 ## Grammar 
 We start by defining Regular Definition 
