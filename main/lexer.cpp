@@ -134,8 +134,8 @@ void lexer::Tokenize() // function that tokenizes your input stream
         {
         // start state
         case 0:
-            //cout << "State 0" << endl;
-            // transition to Identifier DFA
+            // cout << "State 0" << endl;
+            //  transition to Identifier DFA
             if (isalpha(*it) || (*it) == '_')
             {
 
@@ -153,7 +153,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             else if ((*it) == '`')
             {
                 state = 3;
-                //currentLexeme.push_back(*it);
+                // currentLexeme.push_back(*it);
             }
             // Transition to comment
             else if ((*it) == ';')
@@ -176,9 +176,10 @@ void lexer::Tokenize() // function that tokenizes your input stream
             // Transition to equal to operator DFA
             else if ((*it) == '=')
             {
-
+                currentLexeme.push_back(*it);
                 tokens.push_back(token(currentLexeme, TokenType::EQUAL_TO));
                 state = 0;
+                currentLexeme = "";
             }
 
             else if ((*it) == ' ' || (*it) == '\t' || (*it) == '\n' || (*it) == '\r')
@@ -213,7 +214,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
 
             break;
         case 1:
-            //cout << "state 1";
+            // cout << "state 1";
             if (isalpha(*it) || (*it) == '_' || isdigit(*it))
             {
 
@@ -227,7 +228,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
                 // anything other than alphabet, digit or underscore ( int , ^ )
                 // we have to check if its a reserved word
                 if (checkIfKeyword(currentLexeme) != TokenType::ID)
-        
+
                 {
                     // std::cout << "\n"
                     //           << "TokenAdded --keyword " + currentLexeme << "\n";
@@ -251,7 +252,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             }
             break;
         case 2:
-            //cout << "state 2";
+            // cout << "state 2";
 
             if (isdigit(*it))
             {
@@ -263,7 +264,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
                 // cout << "\n"
                 //      << "TokenAdded  " + currentLexeme << " \n";
                 tokens.push_back(token(string(currentLexeme), TokenType::Digit));
-                
+
                 state = 0;
                 currentLexeme = "";
                 --it;
@@ -272,11 +273,11 @@ void lexer::Tokenize() // function that tokenizes your input stream
             break;
 
         case 3:
-            //cout << "state 3";
+            // cout << "state 3";
 
             if ((*it) == '`')
             { //  TODO: check for double back tick
-                //currentLexeme.push_back(*it);
+                // currentLexeme.push_back(*it);
                 tokens.push_back(token(string(currentLexeme), TokenType::string));
                 state = 0;
                 currentLexeme = "";
@@ -289,7 +290,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             break;
 
         case 4:
-            //cout << "state 4";
+            // cout << "state 4";
 
             if ((*it) == '\n')
             {
@@ -300,7 +301,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
 
                 // else
                 // {
-                    tokens.push_back(token(string(currentLexeme), TokenType::koment));
+                tokens.push_back(token(string(currentLexeme), TokenType::koment));
                 //}
                 state = 0;
                 currentLexeme = "";
@@ -313,7 +314,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             break;
 
         case 5:
-            //cout << "state 5 (RO, LE)";
+            // cout << "state 5 (RO, LE)";
 
             if ((*it) == '=')
             {
@@ -347,7 +348,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
             break;
 
         case 6:
-            //cout << "state 6 (RO, GE)";
+            // cout << "state 6 (RO, GE)";
 
             if ((*it) == '=')
             {
@@ -375,7 +376,7 @@ void lexer::Tokenize() // function that tokenizes your input stream
 
         case 7:
 
-            //cout << "state 7 assignment OP";
+            // cout << "state 7 assignment OP";
             if ((*it) == '=')
             {
                 currentLexeme.push_back(*it);
@@ -461,7 +462,7 @@ void lexer::resetPointer()
     index = 0;
 }
 
-// int look 
+// int look
 token lexer::peek(int howFar)
 {
     if (howFar <= 0)
