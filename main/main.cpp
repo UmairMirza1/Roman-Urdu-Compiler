@@ -153,7 +153,6 @@ int *loadDataSegment(std::vector<mapElement> symbolTable)
 	for (int i = 1; i < symbolTable.size(); i++)
 	{
 		dataSegment[i - 1] = stoi(symbolTable[i].initVal);
-		// cout << symbolTable[i].initVal << " " << endl;
 	}
 
 	// print data segment
@@ -195,6 +194,7 @@ void VM(string filename, std::vector<mapElement> symbolTable)
 		exec.push_back(line);
 	}
 	std::vector<std::string> tokens;
+
 	// load values in an int array from symbol table
 	auto dataSegment = loadDataSegment(symbolTable);
 
@@ -415,9 +415,6 @@ int main(int argc, char *argv[])
 		std::vector<mapElement> symbolTable = _parser.symbolTable;
 		VM("TAC.txt", symbolTable);
 
-		// string test ="-";
-		// int t3 = getOpcode(test);
-		// std::cout << t3 << std::endl;
 	}
 	else if (argc > 2)
 	{ // argument limit exceeds
