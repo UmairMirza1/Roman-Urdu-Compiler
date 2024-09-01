@@ -1,0 +1,21 @@
+EXEC = a.out
+CC = clang++ -std=c++17
+OBJ = lexer.o main.o myparser.o
+CFLAGS = -g -Wall -Wextra
+
+$(EXEC): $(OBJ)
+	$(CC) $(OBJ) -o $(EXEC) -lm
+
+lexer.o: lexer.cpp lexer.h
+	$(CC) $(CFLAGS) -c lexer.cpp -o lexer.o
+
+main.o: main.cpp lexer.h
+	$(CC) $(CFLAGS) -c main.cpp -o main.o
+
+myparser.o: myparser.cpp myparser.h
+	$(CC) $(CFLAGS) -c myparser.cpp -o myparser.o
+
+clean:
+	rm -f $(EXEC) $(OBJ)
+
+.PHONY: clean
